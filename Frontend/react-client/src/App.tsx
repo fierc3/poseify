@@ -1,23 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import {env} from './config';
+import { getCurrentUserProfile } from './helpers/api';
+import { IDefaultReturn } from './helpers/api.types';
 
 function App() {
+
+  const [userProfile, setUserProfile] = useState<IDefaultReturn>()
+
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Edit <code>src/App.tsx</code> and save to reload.
+          Current Backend: {env.backend.baseUrl}
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <p>{JSON.stringify(userProfile)}</p>
+
+          <button onClick={async () => {setUserProfile((await getCurrentUserProfile()))}}>Fetch Test User</button>
       </header>
     </div>
   );
