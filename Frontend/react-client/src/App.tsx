@@ -4,22 +4,17 @@ import './App.css';
 import {env} from './config';
 import { getCurrentUserProfile } from './helpers/api';
 import { IDefaultReturn } from './helpers/api.types';
+import { Route, Routes } from 'react-router-dom';
+import Dashboard from './pages/dashboard/Dashboard';
+import Visitor from './pages/visitor/Visitor';
 
-function App() {
-
-  const [userProfile, setUserProfile] = useState<IDefaultReturn>()
-
+const App = () => {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Current Backend: {env.backend.baseUrl}
-        </p>
-        <p>{JSON.stringify(userProfile)}</p>
-
-          <button onClick={async () => {setUserProfile((await getCurrentUserProfile()))}}>Fetch Test User</button>
-      </header>
+      <Routes>
+        <Route path="/" element={<Visitor/>}/>
+        <Route path="/Dashboard" element={<Dashboard/>}/>
+      </Routes>
     </div>
   );
 }
