@@ -75,14 +75,14 @@ def estimate_pose_for_video(file_dir, user_id, guid, file_extension, new_file_ex
     print('infer_video_2d.py, 2D joint position inference by Detectron2')
     print(command)
     print('-----------------------------')
-    # subprocess.run(command)
+    subprocess.run(command)
 
     command = f'python prepare_data_2d_custom.py -i ..\\{directory} -o {guid}'
     print('-----------------------------')
     print('prepare_data_2d_custom.py, Preparing data for VideoPose3D')
     print(command)
     print('-----------------------------')
-    # subprocess.run(command, cwd='.\\data')
+    subprocess.run(command, cwd='.\\data')
 
     command = f'python run.py -d custom -k {guid} -arc 3,3,3,3,3 -c checkpoint --evaluate pretrained_h36m_detectron_coco.bin --render --viz-subject {guid}.{file_extension} --viz-action custom --viz-camera 0 --viz-video {input_video_location} --viz-export {estimation_result_location} --viz-output {estimation_result_location}.mp4 --viz-size 6'
     print('------------------------------')
