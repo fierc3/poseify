@@ -2,6 +2,7 @@ from ffmpeg import FFmpeg,Progress
 import subprocess
 import argparse
 import sys
+import os
 
 # Copyright Shadow Wizard Money Gang & Mind Goblin
 
@@ -15,7 +16,7 @@ def parse_args():
         type=str
     )
     parser.add_argument(
-        '--user_id',
+        '--user-id',
         dest='user_id',
         help='user_id',
         default=False,
@@ -58,16 +59,17 @@ def main(args):
     estimate_pose_for_video(args.file_dir, args.user_id, args.guid, args.file_extension, args.new_file_extension, args.scale_fps)
 
 def estimate_pose_for_video(file_dir, user_id, guid, file_extension, new_file_extension=False, scale_fps=False):
+    file_dir.replace('/', '\\')
+    if not file_dir.endswith('\\'):
+        file_dir += '\\'
     directory = f"{file_dir}{user_id or ''}"
     file_user_guid = f"{file_dir}{user_id or ''}\\{guid}"
-    print(f'fugid {file_user_guid}')
     input_video_location = f"{file_user_guid}.{file_extension}"
-    print(f'ivl {input_video_location}')
     estimation_result_location = f"{file_user_guid}_result"
-    print(f'erl {estimation_result_location}')
-    # if new_file_extension or scale_fps:
-    #     input_video_location = ffmpeg_conversion(input_video_location, file_user_guid, new_file_extension, scale_fps)
-    #     file_extension = new_file_extension or file_extension
+
+    if new_file_extension or scale_fps:
+        input_video_location = ffmpeg_conversion(input_video_location, file_user_guid, new_file_extension, scale_fps)
+        file_extension = new_file_extension or file_extension
     
     print(f'Frames: {get_frame_count(input_video_location)}')
     command = f'python .\\inference\\infer_video_d2.py --cfg COCO-Keypoints/keypoint_rcnn_R_101_FPN_3x.yaml --output-dir {directory} --image-ext {file_extension} {input_video_location}'
@@ -92,29 +94,18 @@ def estimate_pose_for_video(file_dir, user_id, guid, file_extension, new_file_ex
     subprocess.run(command)
 
 def ffmpeg_conversion(input_video_location, file_user_guid, new_file_extension=False, scale_fps=False):
-    if new_file_extension:
-        output_video_location = f"{file_user_guid}_out.{new_file_extension}"
-        if scale_fps:
-            ffmpeg = (
-                FFmpeg()
-                .option("i")
-                .input(input_video_location)
-                .output(
-                    output_video_location,
-                    filter="minterpolate='fps=50'",
-                    crf=0
-                ))
-        else:
-            ffmpeg = (
-                FFmpeg()
-                .option("i")
-                .input(input_video_location)
-                .output(
-                    output_video_location,
-                    crf=0
-                ))
-
-        ffmpeg.execute()
+    if not new_file_extension:
+        output_video_location = input_video_location
+        input_video_location += "_old"
+        os.system(f'copy {output_video_location} {input_video_location}')
+    else:
+        output_video_location = f"{file_user_guid}.{new_file_extension}"
+    
+    if scale_fps:
+        command = ['ffmpeg', '-y', '-i', f'{input_video_location}', '-filter', "minterpolate='fps=50'", '-crf', '0', f'{output_video_location}']
+    else:
+        command = ['ffmpeg', '-y', '-i', f'{input_video_location}', '-crf', '0', f'{output_video_location}']
+    subprocess.run(command)
     return output_video_location
 
 def get_frame_count(input_video_location):
