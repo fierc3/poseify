@@ -9,25 +9,18 @@ export interface IApiData{
     data: string | IUserProfile; 
 }
 
-export enum ErrorCodes{
-    General = "general",
-    Validation= "validation",
-    Unhandled= "unhandled"
-}
-
 export enum Methods{
     Get = "GET"
 }
 
-export interface IError{
-    errorCode: ErrorCodes;
-    errorText: string;
-}
-
-export interface IDefaultReturn {
-    success: boolean;
-    data: IApiData | undefined;
-    error: IError;
+export interface IProblemDetails {
+    type?: string | undefined;
+    title?: string | undefined;
+    status?: number | undefined;
+    detail?: string | undefined;
+    instance?: string | undefined;
+    extensions?: { [key: string]: Object; } | undefined;
+    [key: string] : any;
 }
 
 

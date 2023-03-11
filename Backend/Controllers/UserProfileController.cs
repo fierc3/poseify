@@ -20,7 +20,7 @@ namespace Backend.Controllers {
 
 
         [HttpGet(Name = "GetCurrentUserProfile")]
-        public DefaultReturn<UserProfile, DefaultError> Get(string guid)
+        public ActionResult<UserProfile> Get(string guid)
         {
             _logger.LogDebug("UserProfile GET requesed");
             UserProfile? data = null;
@@ -31,20 +31,13 @@ namespace Backend.Controllers {
                 // use linq or rql to load Userprofile
                 data= session.Query<UserProfile>().Where(x => x.InternalGuid == guid).FirstOrDefault();
             }
-            
-            var error = new DefaultError();
-            if (data == null)
+
+            if(data == null)
             {
-                error.ErrorCode = "10";
-                error.ErrorText = $"Userporfile with ID {guid} not found";
+                return NotFound();
             }
 
-            return new DefaultReturn<UserProfile, DefaultError>()
-            {
-                Data = data,
-                Error = error,
-                Success = data == null ? false : true // only return sucessfull if userprofile was found
-            };
+            return data;
         }
     }
 }
