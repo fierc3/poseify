@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Raven.Client.Documents;
 
 namespace Backend.Controllers { 
 
@@ -8,24 +9,41 @@ namespace Backend.Controllers {
     {
 
         private readonly ILogger<UserProfileController> _logger;
+        private readonly IDocumentStore _store;
 
         public UserProfileController(ILogger<UserProfileController> logger)
         {
             _logger = logger;
+            // read ravendb store via lazy loading
+            _store = DocumentStoreHolder.Store;
         }
 
 
         [HttpGet(Name = "GetCurrentUserProfile")]
-        public DefaultReturn<UserProfile, DefaultError> Get()
+        public DefaultReturn<UserProfile, DefaultError> Get(string guid)
         {
             _logger.LogDebug("UserProfile GET requesed");
-            var data = new UserProfile() { DisplayName = "John Doe", InternalGuid = "Secret", Token = "xxxxxxx", ImageUrl = "https://64.media.tumblr.com/06cdcf5cbf141c01e6e926ab4588c755/tumblr_navzwsvEMm1rdr926o1_400.gif" };
+            UserProfile? data = null;
+
+            // get session for raven db
+            using (var session = _store.OpenSession())
+            {
+                // use linq or rql to load Userprofile
+                data= session.Query<UserProfile>().Where(x => x.InternalGuid == guid).FirstOrDefault();
+            }
+            
             var error = new DefaultError();
+            if (data == null)
+            {
+                error.ErrorCode = "10";
+                error.ErrorText = $"Userporfile with ID {guid} not found";
+            }
+
             return new DefaultReturn<UserProfile, DefaultError>()
             {
                 Data = data,
                 Error = error,
-                Success = true
+                Success = data == null ? false : true // only return sucessfull if userprofile was found
             };
         }
     }
