@@ -17,23 +17,28 @@ public class EstimationHandler
 
     public string HanldeUploadedFile(string userGuid, string directory, string fileName, string fileExtension, string displayName, IEnumerable<Tag> tags)
     {
-        string estimationPath = runEstimation(userGuid, directory, fileName, fileExtension);
+        _ = runEstimation(userGuid, directory, fileName, fileExtension);
+        string estimationPath = $"{directory}/{userGuid}/{fileName}.npz";
         string resultGuid = storeEstimationResultToDb(userGuid, estimationPath, fileName, tags, displayName);
+        //delete file from filesystem
         return resultGuid;
     }
-    private string runEstimation(string userGuid, string directory, string fileName, string fileExtension) {
+
+    //todo async
+    private bool runEstimation(string userGuid, string directory, string fileName, string fileExtension) {
         //run python estimation script
         //$"python .\estimate_pose.py --dir {directory} --guid {fileName} --file-ext {fileExtension} --scale-fps true
-        return $"{directory}/{userGuid}/{fileName}.npz";
+        //on successful completion return true
+        return true;
     }
 
     private string storeEstimationResultToDb(string userGuid, string path, string file_name, IEnumerable<Tag>? tags, string display_name) {
         string guid = Guid.NewGuid().ToString();
         // storing a new estimation ravenDB, file attached to the entry
         using (var session = _store.OpenSession())
-        using (var file = System.IO.File.Open(path, FileMode.Open))
+        using (var file = File.Open(path, FileMode.Open))
         {
-            Estimation estimation = new Estimation
+            Estimation estimation = new()
             {
                 Guid = guid,
                 DisplayName = display_name,
