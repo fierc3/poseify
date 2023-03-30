@@ -1,5 +1,6 @@
 ﻿using Raven.Client.Documents;
 using System.IO;
+using System.Xml.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 public class TagHandler
@@ -28,6 +29,16 @@ public class TagHandler
             tag = session.Query<Tag>().Where(x => x.InternalGuid == guid).FirstOrDefault();
         }
         return tag;
+    }
+
+    public IEnumerable<Tag> GetTagsFromGuid(IEnumerable<string> tagGuids) {
+        string guid = Guid.NewGuid().ToString();
+        IEnumerable<Tag>? tags = null;
+        using (var session = _store.OpenSession())
+        {
+            tags = session.Query<Tag>().Where(x => tagGuids.Contains(x.InternalGuid));
+        }
+        return tags;
     }
 }
 
