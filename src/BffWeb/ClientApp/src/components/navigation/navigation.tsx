@@ -4,7 +4,7 @@ import { FC, useCallback, useState } from 'react';
 import { getCurrentUserProfile, isReturnData } from '../../helpers/api';
 import useClaims from '../../helpers/claims';
 
-const Visitor: FC = () => {
+const Navigation: FC = () => {
   const { data: claims, isLoading } = useClaims();
   let logoutUrl = claims?.find((claim: { type: string; }) => claim.type === 'bff:logout_url') 
   let nameDict = claims?.find((claim: { type: string; }) => claim.type === 'name') ||  claims?.find((claim: { type: string; }) => claim.type === 'sub');
@@ -41,4 +41,4 @@ return (
 )
 }
 
-export default Visitor;
+export default Navigation;
