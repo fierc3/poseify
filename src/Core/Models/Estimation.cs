@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 [Serializable]
 public class Estimation
 {
-    public string Guid { get; set; } = "";
+    public string InternalGuid { get; set; } = "";
     public string DisplayName { get; set; } = "";
     public IEnumerable<string> Tags { get; set; } = new List<string>();
     public string UploadingProfile { get; set; } = null;

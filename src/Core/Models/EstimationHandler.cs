@@ -1,7 +1,7 @@
-﻿
-using Backend.Controllers;
+﻿using Backend.Controllers;
 using Raven.Client.Documents;
 using System;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 public class EstimationHandler
 {
@@ -14,17 +14,16 @@ public class EstimationHandler
         _store = DocumentStoreHolder.Store;
     }
 
-
-    public string HanldeUploadedFile(string userGuid, string directory, string fileName, string fileExtension, string displayName, IEnumerable<Tag> tags)
+    public Estimation HanldeUploadedFile(string userGuid, string directory, string fileName, string fileExtension, string displayName, IEnumerable<Tag> tags)
     {
         _ = runEstimation(userGuid, directory, fileName, fileExtension);
         string estimationPath = $"{directory}/{userGuid}/{fileName}.npz";
-        string resultGuid = storeEstimationResultToDb(userGuid, estimationPath, fileName, tags, displayName);
-        //delete file from filesystem
-        return resultGuid;
+        Estimation estimation = storeEstimationResultToDb(userGuid, estimationPath, fileName, tags, displayName);
+        //todo delete uploaded and resulting file from filesystem
+        return estimation;
     }
 
-    //todo async
+    //todo make this async
     private bool runEstimation(string userGuid, string directory, string fileName, string fileExtension) {
         //run python estimation script
         //$"python .\estimate_pose.py --dir {directory} --guid {fileName} --file-ext {fileExtension} --scale-fps true
@@ -32,15 +31,16 @@ public class EstimationHandler
         return true;
     }
 
-    private string storeEstimationResultToDb(string userGuid, string path, string file_name, IEnumerable<Tag>? tags, string display_name) {
+    //create a new estimation entry and attach a file to it
+    private Estimation storeEstimationResultToDb(string userGuid, string path, string file_name, IEnumerable<Tag>? tags, string display_name) {
         string guid = Guid.NewGuid().ToString();
-        // storing a new estimation ravenDB, file attached to the entry
+        Estimation? estimation = null;
         using (var session = _store.OpenSession())
         using (var file = File.Open(path, FileMode.Open))
         {
-            Estimation estimation = new()
+            estimation = new()
             {
-                Guid = guid,
+                InternalGuid = guid,
                 DisplayName = display_name,
                 Tags = tags.Select(x => x.InternalGuid),
                 UploadingProfile = userGuid,
@@ -49,8 +49,9 @@ public class EstimationHandler
             session.Store(estimation, guid);
             session.Advanced.Attachments.Store(guid, file_name, file);
             session.SaveChanges();
+            estimation = session.Query<Estimation>().Where(x => x.InternalGuid == guid).FirstOrDefault();
         }
-        return guid;
+        return estimation;
     }
 }
 
