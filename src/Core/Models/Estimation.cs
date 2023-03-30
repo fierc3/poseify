@@ -5,8 +5,8 @@ using System.Text.Json.Serialization;
 public class Estimation
 {
     public string Guid { get; set; } = "";
-    public List<string> Tags { get; set; } = new List<string>();
+    public string DisplayName { get; set; } = "";
+    public IEnumerable<string> Tags { get; set; } = new List<string>();
     public string UploadingProfile { get; set; } = null;
     public DateTime UploadDate { get; set; } = DateTime.Now;
-
 }

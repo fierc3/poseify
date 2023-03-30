@@ -5,6 +5,6 @@ using System.Text.Json.Serialization;
 public class Tag
 {
     public string InternalGuid { get; set; } = "";
-    public string Name { get; set; } = "";
+    public string DisplayName { get; set; } = "";
 }
 
