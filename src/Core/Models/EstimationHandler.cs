@@ -18,9 +18,9 @@ public class EstimationHandler : IEstimationHandler
         _configuration = configuration;
     }
 
-    public Estimation HanldeUploadedFile(string userGuid, string directory, string fileName, string fileExtension, string displayName, IEnumerable<Tag> tags) {
+    public Estimation HanldeUploadedFile(string userGuid, string directory, string fileName, string fileExtension, string displayName, IEnumerable<Tag>? tags) {
         _ = runEstimation(userGuid, directory, fileName, fileExtension);
-        string estimationPath = $"{directory}/{userGuid}/{fileName}.npz";
+        string estimationPath = $"{directory}{userGuid}\\{fileName}.{fileExtension}.npz";
         Estimation estimation = storeEstimationResultToDb(userGuid, estimationPath, fileName, tags, displayName);
         //todo delete uploaded and resulting file from filesystem
         return estimation;
@@ -34,7 +34,7 @@ public class EstimationHandler : IEstimationHandler
             StartInfo = new ProcessStartInfo
             {
                 FileName = overridePython ?? "python",
-                Arguments = $"-u {estimationScriptLocation} --dir {directory}/{userGuid} --guid {fileName} --file-ext {fileExtension}",
+                Arguments = $"-u {estimationScriptLocation} --dir {directory}{userGuid} --guid {fileName} --file-ext {fileExtension}",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
