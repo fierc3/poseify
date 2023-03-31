@@ -3,7 +3,7 @@ using Raven.Client.Documents;
 using System;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-public class EstimationHandler
+public class EstimationHandler : IEstimationHandler
 {
     private readonly ILogger<EstimationHandler> _logger;
     private readonly IDocumentStore _store;
