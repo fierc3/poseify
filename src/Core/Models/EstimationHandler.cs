@@ -1,21 +1,24 @@
 ﻿using Backend.Controllers;
+using Microsoft.Extensions.Configuration;
 using Raven.Client.Documents;
 using System;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Diagnostics;
 
 public class EstimationHandler : IEstimationHandler
 {
     private readonly ILogger<EstimationHandler> _logger;
     private readonly IDocumentStore _store;
+    private readonly IConfiguration _configuration;
 
-    public EstimationHandler(ILogger<EstimationHandler> logger)
+    public EstimationHandler(ILogger<EstimationHandler> logger, IConfiguration configuration)
     {
         _logger = logger;
         _store = DocumentStoreHolder.Store;
+        _configuration = configuration;
     }
 
-    public Estimation HanldeUploadedFile(string userGuid, string directory, string fileName, string fileExtension, string displayName, IEnumerable<Tag> tags)
-    {
+    public Estimation HanldeUploadedFile(string userGuid, string directory, string fileName, string fileExtension, string displayName, IEnumerable<Tag> tags) {
         _ = runEstimation(userGuid, directory, fileName, fileExtension);
         string estimationPath = $"{directory}/{userGuid}/{fileName}.npz";
         Estimation estimation = storeEstimationResultToDb(userGuid, estimationPath, fileName, tags, displayName);
@@ -25,9 +28,33 @@ public class EstimationHandler : IEstimationHandler
 
     //todo make this async
     private bool runEstimation(string userGuid, string directory, string fileName, string fileExtension) {
-        //run python estimation script
-        //$"python .\estimate_pose.py --dir {directory} --guid {fileName} --file-ext {fileExtension} --scale-fps true
-        //on successful completion return true
+        string? estimationScriptLocation = _configuration["EstimationScriptLocation"];
+        string? overridePython = _configuration["OverridePythonVersion"];
+        Process estimationProcess = new Process{
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = overridePython ?? "python",
+                Arguments = $"-u {estimationScriptLocation} --dir {directory}/{userGuid} --guid {fileName} --file-ext {fileExtension}",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            },
+            EnableRaisingEvents = true
+        };
+        estimationProcess.ErrorDataReceived += (se, ev) => {
+            _logger.Log(LogLevel.Error, ev.Data);
+            //todo handle errors
+        };
+        estimationProcess.OutputDataReceived += (se, ev) => {
+            _logger.Log(LogLevel.Information, ev.Data);
+            //todo update progress
+        };
+
+        estimationProcess.Start();
+        estimationProcess.BeginErrorReadLine();
+        estimationProcess.BeginOutputReadLine();
+        estimationProcess.WaitForExit();
         return true;
     }
 
