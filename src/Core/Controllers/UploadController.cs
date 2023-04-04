@@ -22,14 +22,44 @@ namespace Backend.Controllers {
             _configuration = configuration;
         }
 
-
         [HttpGet(Name = "GetEstimation")]
         public ActionResult<Estimation> Get(string userGuid, string fileName, string fileExtension, string displayName, IEnumerable<string>? tags)
         {
-            // todo make sure user exists in db
+            // assuming can only be called if user exists in db, so user_id isnt being checked
             string? directory = _configuration["UploadDirectory"];
-            Estimation estimation = _estimationHandler.HanldeUploadedFile(userGuid, directory, fileName, fileExtension, displayName, null);
+            Estimation? estimation;
+            try
+            {
+                estimation = _estimationHandler.HanldeUploadedFile(userGuid, directory, fileName, fileExtension, displayName, null);
+            }
+            catch (Exception ex)
+            {
+                return Problem("Could not convert input");
+            }
             return estimation;
         }
+
+        // ---- only for testing purposes ----
+
+        //[HttpGet(Name = "GetEstimation")]
+        //public ActionResult<Estimation> Get()
+        //{
+        //    // assuming this can only happen if user exists in db, so user_id isnt being checked
+        //    string userGuid = "DEEZNUZ";
+        //    string fileName = "test_man";
+        //    string fileExtension = "mp4";
+        //    string displayName = "test1";
+        //    string? directory = _configuration["UploadDirectory"];
+        //    Estimation? estimation;
+        //    try
+        //    {
+        //        estimation = _estimationHandler.HanldeUploadedFile(userGuid, directory, fileName, fileExtension, displayName, null);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Problem("Could not convert input");
+        //    }
+        //    return estimation;
+        //}
     }
 }
