@@ -17,21 +17,18 @@ public class EstimationHandler : IEstimationHandler
     }
 
     public Estimation HanldeUploadedFile(string userGuid, string directory, string fileName, string fileExtension, string displayName, IEnumerable<Tag>? tags) {
-        bool exitCode = runEstimation(userGuid, directory, fileName, fileExtension);
-        if (!exitCode) {
-            throw new Exception();
-        }
+        RunEstimation(userGuid, directory, fileName, fileExtension);
         string fileLocation = $"{directory}\\{userGuid}\\{fileName}";
         string estimationPath = $"{fileLocation}.{fileExtension}.npz";
         string previewPath = $"{fileLocation}_result.mp4";
-        Estimation estimation = storeEstimationResultToDb(userGuid, estimationPath, previewPath, fileName, tags, displayName);
+        Estimation estimation = StoreEstimationResultToDb(userGuid, estimationPath, previewPath, fileName, tags, displayName);
         File.Delete($"{fileLocation}.mp4");
         return estimation;
     }
 
     //todo make this async?
-    private bool runEstimation(string userGuid, string directory, string fileName, string fileExtension) {
-        bool exitCode = true;
+    private void RunEstimation(string userGuid, string directory, string fileName, string fileExtension) {
+        int totalFrames = 0;
         string? estimationScriptLocation = _configuration["EstimationScriptLocation"];
         string? overridePython = _configuration["OverridePythonVersion"];
         Process estimationProcess = new Process{
@@ -48,12 +45,25 @@ public class EstimationHandler : IEstimationHandler
         };
         estimationProcess.OutputDataReceived += (se, ev) => {
             _logger.Log(LogLevel.Information, ev.Data);
-            //todo update progress to frontend
+            if (ev.Data != null) {
+                if (totalFrames == 0 && ev.Data.Contains("Total Frames:")) {
+                    totalFrames = int.Parse(ev.Data.Split(':').Last());
+                }
+                if (ev.Data.Contains("Frame") && ev.Data.Contains("processed") || ev.Data.Contains($"/{totalFrames}")) // before or is infer2d after or is run.py
+                { 
+                    // bubble progress event to frontend 
+                }
+            }
         };
         estimationProcess.ErrorDataReceived += (se, ev) => {
             _logger.Log(LogLevel.Error, ev.Data);
-            if (ev.Data.Contains("Invalid result in")) {
-                exitCode = false;
+            // todo propper error parsing, disabled ffmpeg verbosity so now only propper errors are printed
+            if (ev.Data != null) {
+                if (ev.Data.Contains("Invalid result in")) {
+                    throw new Exception(ev.Data);
+                }
+                // todo other errors might occur but harmless, still have to handle them
+                
             }
         };
 
@@ -61,11 +71,11 @@ public class EstimationHandler : IEstimationHandler
         estimationProcess.BeginOutputReadLine();
         estimationProcess.BeginErrorReadLine();
         estimationProcess.WaitForExit();
-        return exitCode;
+        return;
     }
 
     //create a new estimation entry and attach a file to it
-    private Estimation storeEstimationResultToDb(string userGuid, string estimationPath, string previewPath, string file_name, IEnumerable<Tag>? tags, string display_name) {
+    private Estimation StoreEstimationResultToDb(string userGuid, string estimationPath, string previewPath, string file_name, IEnumerable<Tag>? tags, string display_name) {
         string guid = Guid.NewGuid().ToString();
         Estimation? estimation = null;
 

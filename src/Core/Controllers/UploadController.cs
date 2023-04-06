@@ -34,7 +34,7 @@ namespace Backend.Controllers {
             }
             catch (Exception ex)
             {
-                return Problem("Could not convert input");
+                return Problem($"A problem occured when trying to convert input with VideoPose3D\nDetail:{ex}");
             }
             return estimation;
         }
@@ -57,7 +57,7 @@ namespace Backend.Controllers {
         //    }
         //    catch (Exception ex)
         //    {
-        //        return Problem("Could not convert input");
+        //        return Problem($"A problem occured when trying to convert input with VideoPose3D\nDetail:{ex}");
         //    }
         //    return estimation;
         //}
