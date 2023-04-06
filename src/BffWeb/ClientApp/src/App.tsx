@@ -13,13 +13,15 @@ import { navigationDarkTheme } from "./themes/navigation-theme-dark";
 const App = () => {
   initializeIcons();
 
+  const navbarHeight = 60;
+
   return (
     <div className="App">
       <QueryClientProvider client={new QueryClient()}>
-        <ThemeProvider theme={navigationDarkTheme}>
-          <DefaultNavbar />
+        <ThemeProvider theme={navigationDarkTheme} style={{height: navbarHeight, top: -1, width: "100vw", position: "sticky"}}>
+          <DefaultNavbar/>
         </ThemeProvider>
-        <ThemeProvider theme={contentDarkTheme}>
+        <ThemeProvider theme={contentDarkTheme} style={{paddingTop: navbarHeight}}>
           <Routes>
             {publicRoutes}
             <Route element={<AuthUserLayout />}>{loggedInRoutes}</Route>
