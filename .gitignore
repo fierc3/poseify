@@ -27,3 +27,10 @@ src/Core/PoseEstimation/images/
 src/Core/PoseEstimation/inference/
 src/Core/PoseEstimation/run.py
 src/Core/PoseEstimation/trial.ps1
+.vs/poseify/FileContentIndex
+.vs/poseify/v17
+.vs/slnx.sqlite
+.vs/VSWorkspaceState.json
+Backend/obj
+Estimation_test
+src/Core/PoseEstimation/log.txt
