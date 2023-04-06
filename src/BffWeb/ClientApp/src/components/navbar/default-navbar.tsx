@@ -1,4 +1,4 @@
-import { CommandBar, ICommandBarItemProps, Stack } from "@fluentui/react";
+import { CommandBar, IButtonProps, ICommandBarItemProps, Stack } from "@fluentui/react";
 import { useNavigate } from "react-router-dom";
 import useClaims, { useLoginCheck } from "../../helpers/claims";
 
@@ -17,6 +17,8 @@ const DefaultNavbar = () => {
   const openUrl = (url: string) => {
     window.open(url, "_self", "noreferrer");
   };
+
+  const overflowProps: IButtonProps = { ariaLabel: 'More' };
 
   const items: ICommandBarItemProps[] = [
     {
@@ -86,6 +88,8 @@ const DefaultNavbar = () => {
           ariaLabel="Inbox actions"
           primaryGroupAriaLabel="Main actions"
           farItemsGroupAriaLabel="User actions"
+          overflowButtonProps={overflowProps}
+          overflowItems={[]}
         />
       </Stack.Item>
     </Stack>
