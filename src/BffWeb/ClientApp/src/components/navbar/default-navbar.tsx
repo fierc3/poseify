@@ -52,7 +52,7 @@ const DefaultNavbar = () => {
           ariaLabel: "User Settings Page",
           iconOnly: true,
           iconProps: { iconName: "Settings" },
-          onClick: () => console.log("open settings"),
+          onClick: () => navigate('/Settings'),
         },
         {
           key: "logout",
