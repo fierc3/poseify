@@ -1,56 +1,70 @@
-import React, { useState } from 'react';
-import {
-  Collapse,
-  Navbar,
-  NavbarToggler,
-  NavbarBrand,
-  Nav,
-  NavItem,
-  NavLink,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
-  NavbarText,
-  NavbarProps,
-} from 'reactstrap';
+import { CommandBar, ICommandBarItemProps, Stack } from '@fluentui/react';
+import useClaims, { useLoginCheck } from '../../helpers/claims';
 
-const DefaultNavbar = (args:NavbarProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+const DefaultNavbar = (args: any) => {
+  const [isLoggedIn] = useLoginCheck();
+  const { data: claims } = useClaims();
+  let logoutUrl = claims?.find((claim: { type: string; }) => claim.type === 'bff:logout_url') 
+  let nameDict = claims?.find((claim: { type: string; }) => claim.type === 'name') ||  claims?.find((claim: { type: string; }) => claim.type === 'sub');
+  let username = nameDict?.value; 
 
-  const toggle = () => setIsOpen(!isOpen);
+  const openUrl = (url: string) => {
+    window.open(url, '_self', 'noreferrer');
+  };
+
+  const items: ICommandBarItemProps[] = [
+    {
+      key: 'homeItem',
+      text: 'Home',
+      cacheKey: 'myCacheKey', // changing this key will invalidate this item's cache
+      iconProps: { iconName: 'Home' },
+    }]
+
+  const farItems: ICommandBarItemProps[] = []
+
+  const userAction: ICommandBarItemProps[] = isLoggedIn() ? [
+    {
+      key: 'user',
+      text: 'User Settings',
+      // This needs an ariaLabel since it's icon-only
+      ariaLabel: 'User Settings Page',
+      iconOnly: true,
+      iconProps: { iconName: 'Settings' },
+      onClick: () => console.log("open settings")
+    },
+    {
+      key: 'logout',
+      text: 'Logout, ' + username,
+      // This needs an ariaLabel since it's icon-only
+      ariaLabel: 'Logout User',
+      iconProps: { iconName: 'Logout' },
+      onClick: () => openUrl(logoutUrl?.value ?? 'shit'),
+    }] : [{
+      key: 'login',
+      text: 'Login',
+      // This needs an ariaLabel since it's icon-only
+      ariaLabel: 'Login User',
+      iconProps: { iconName: 'Login' },
+      onClick: () => openUrl('/bff/login?returnUrl=/'),
+    }]
 
   return (
-    <div>
-      <Navbar {...args}>
-        <NavbarBrand href="/">reactstrap</NavbarBrand>
-        <NavbarToggler onClick={toggle} />
-        <Collapse isOpen={isOpen} navbar>
-          <Nav className="me-auto" navbar>
-            <NavItem>
-              <NavLink href="/components/">Components</NavLink>
-            </NavItem>
-            <NavItem>
-              <NavLink href="https://github.com/reactstrap/reactstrap">
-                GitHub
-              </NavLink>
-            </NavItem>
-            <UncontrolledDropdown nav inNavbar>
-              <DropdownToggle nav caret>
-                Options
-              </DropdownToggle>
-              <DropdownMenu right>
-                <DropdownItem>Option 1</DropdownItem>
-                <DropdownItem>Option 2</DropdownItem>
-                <DropdownItem divider />
-                <DropdownItem>Reset</DropdownItem>
-              </DropdownMenu>
-            </UncontrolledDropdown>
-          </Nav>
-          <NavbarText>Simple Text</NavbarText>
-        </Collapse>
-      </Navbar>
-    </div>
+    <Stack style={{ height: 60 }} horizontal>
+      <Stack.Item grow={1}>
+        <Stack horizontal style={{ paddingTop: 10, paddingLeft: 10 }}>
+          <h1>Poseify</h1>
+        </Stack>
+      </Stack.Item>
+      <Stack.Item grow={10}>
+        <CommandBar
+          items={items}
+          farItems={[...farItems, ...userAction]}
+          ariaLabel="Inbox actions"
+          primaryGroupAriaLabel="Main actions"
+          farItemsGroupAriaLabel="User actions"
+        />
+      </Stack.Item>
+    </Stack>
   );
 }
 
