@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Raven.Client.Documents;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Backend.Controllers { 
 
@@ -29,10 +30,10 @@ namespace Backend.Controllers {
             using (var session = _store.OpenSession())
             {
                 // use linq or rql to load Userprofile
-                data= session.Query<UserProfile>().Where(x => x.InternalGuid == guid).FirstOrDefault();
+                data = session.Query<UserProfile>().Where(x => x.InternalGuid == guid).FirstOrDefault();
             }
 
-            if(data == null)
+            if (data == null)
             {
                 return NotFound();
             }
