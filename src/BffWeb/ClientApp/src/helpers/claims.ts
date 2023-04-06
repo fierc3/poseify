@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useCallback } from 'react';
 import { useQuery } from 'react-query';
 
 const claimsKeys = {
@@ -27,5 +28,21 @@ function useClaims() {
     }
   )
 }
+
+
+export const useLoginCheck =() => {
+  const { data: claims } = useClaims();
+
+  const isLoggedIn = useCallback(() => {
+    let nameDict = claims?.find((claim: { type: string; }) => claim.type === 'name') ||  claims?.find((claim: { type: string; }) => claim.type === 'sub');
+    let username = nameDict?.value; 
+
+    return username !== undefined;
+  },[claims])
+
+  return [isLoggedIn]
+}
+
+
 
 export { useClaims as default }
