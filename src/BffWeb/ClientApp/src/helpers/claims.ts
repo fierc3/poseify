@@ -37,7 +37,6 @@ export const useLoginCheck =() => {
     let nameDict = claims?.find((claim: { type: string; }) => claim.type === 'name') ||  claims?.find((claim: { type: string; }) => claim.type === 'sub');
     let username = nameDict?.value; 
 
-    console.log('username', username)
     return username !== undefined;
   },[claims])
 

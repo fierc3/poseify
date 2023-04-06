@@ -1,9 +1,4 @@
-import { TextField } from '@fluentui/react';
-import { CompoundButton } from '@fluentui/react/lib/Button';
-import { FC, useCallback, useState } from 'react';
-import Navbar from '../../components/navbar/default-navbar';
-import { getCurrentUserProfile, isReturnData } from '../../helpers/api';
-import useClaims from '../../helpers/claims';
+import { FC } from 'react';
 
 const Home: FC = () => {
 
