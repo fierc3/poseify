@@ -7,7 +7,7 @@
 
 $python_url = "https://www.python.org/ftp/python/3.7.9/python-3.7.9.exe"
 $git_url = "https://github.com/git-for-windows/git/releases/download/v2.39.2.windows.1/Git-2.39.2-64-bit.exe"
-$vp3d_url = "https://github.com/facebookresearch/VideoPose3D.git"
+$vp3d_url = "https://github.com/MadMeister/VideoPose3D_poseify.git"
 $msbuild_url = "https://aka.ms/vs/17/release/vs_buildtools.exe"
 $detectron_url = "git+https://github.com/facebookresearch/detectron2.git"
 $pretrained_model_url = "https://dl.fbaipublicfiles.com/video-pose-3d/pretrained_h36m_detectron_coco.bin"

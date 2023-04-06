@@ -17,3 +17,16 @@ PoseEstimation/inference/
 PoseEstimation/run.py
 PoseEstimation/test_input/
 PoseEstimation/trial.ps1
+src/Core/PoseEstimation/LICENSE
+src/Core/PoseEstimation/checkpoint/
+src/Core/PoseEstimation/common/
+src/Core/PoseEstimation/data/
+src/Core/PoseEstimation/detectron2/
+src/Core/PoseEstimation/ffprobe.exe
+src/Core/PoseEstimation/images/
+src/Core/PoseEstimation/inference/
+src/Core/PoseEstimation/run.py
+src/Core/PoseEstimation/trial.ps1
+.vs/
+Estimation_test
+src/Core/PoseEstimation/log.txt
