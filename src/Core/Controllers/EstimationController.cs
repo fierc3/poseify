@@ -52,29 +52,29 @@ namespace Backend.Controllers {
             {
                 return Problem($"A problem occured when trying to fetch user uploads:{ex}");
             }
-
-        // ---- only for testing purposes ----
-
-        [ActionName("GetEstimationTest")]
-        [HttpGet(Name = "GetEstimationTest")]
-        public ActionResult<Estimation> Get()
-        {
-            // assuming this can only happen if user exists in db, so user_id isnt being checked
-            string userGuid = "DEEZNUZ";
-            string fileName = "test_man";
-            string fileExtension = "mp4";
-            string displayName = "test1";
-            string? directory = _configuration["UploadDirectory"];
-            Estimation? estimation;
-            try
-            {
-                estimation = _estimationHandler.HanldeUploadedFile(userGuid, directory, fileName, fileExtension, displayName, null);
-            }
-            catch (Exception ex)
-            {
-                return Problem($"A problem occured when trying to convert input with VideoPose3D\nDetail:{ex}");
-            }
-            return estimation;
         }
+        //// ---- only for testing purposes ----
+
+        //[ActionName("GetEstimationTest")]
+        //[HttpGet(Name = "GetEstimationTest")]
+        //public ActionResult<Estimation> Get()
+        //{
+        //    // assuming this can only happen if user exists in db, so user_id isnt being checked
+        //    string userGuid = "DEEZNUZ";
+        //    string fileName = "test_man";
+        //    string fileExtension = "mp4";
+        //    string displayName = "test1";
+        //    string? directory = _configuration["UploadDirectory"];
+        //    Estimation? estimation;
+        //    try
+        //    {
+        //        estimation = _estimationHandler.HanldeUploadedFile(userGuid, directory, fileName, fileExtension, displayName, null);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Problem($"A problem occured when trying to convert input with VideoPose3D\nDetail:{ex}");
+        //    }
+        //    return estimation;
+        //}
     }
 }
