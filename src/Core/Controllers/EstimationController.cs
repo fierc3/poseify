@@ -39,6 +39,20 @@ namespace Backend.Controllers {
             return estimation;
         }
 
+        [ActionName("GetUserEstimations")]
+        [HttpGet(Name = "GetUserEstimations")]
+        public ActionResult<IEnumerable<Estimation>?> Get()
+        {
+            try
+            {
+                //todo use userid from token
+                return _estimationHandler.GetAllUserEstimations("DEEZNUZ").ToList();
+            }
+            catch (Exception ex)
+            {
+                return Problem($"A problem occured when trying to fetch user uploads:{ex}");
+            }
+
         // ---- only for testing purposes ----
 
         [ActionName("GetEstimationTest")]

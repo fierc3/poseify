@@ -27,6 +27,14 @@ public class EstimationService : IEstimationService
         return estimation;
     }
 
+    public IEnumerable<Estimation> GetAllUserEstimations(string userGuid) {
+        IEnumerable<Estimation> estimations = new List<Estimation>();
+        using (var session = _store.OpenSession()) {
+            estimations = session.Query<Estimation>().Where(x => x.UploadingProfile == userGuid).ToList();
+        }
+        return estimations;
+    }
+
     //todo make this async?
     private void RunEstimation(string userGuid, string directory, string fileName, string fileExtension) {
         int totalFrames = 0;

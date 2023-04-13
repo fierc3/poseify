@@ -4,12 +4,12 @@ export interface IUserProfile {
     imageurl: string
 }
 
-export interface IApiData{
+export interface IApiData {
     // extend when new endpoint is defined 
-    data: string | IUserProfile; 
+    data: string | IUserProfile;
 }
 
-export enum Methods{
+export enum Methods {
     Get = "GET"
 }
 
@@ -20,7 +20,14 @@ export interface IProblemDetails {
     detail?: string | undefined;
     instance?: string | undefined;
     extensions?: { [key: string]: Object; } | undefined;
-    [key: string] : any;
+    [key: string]: any;
 }
 
+export interface IEstimation {
+    internalGuid: string;
+    displayName: string;
+    tags: string[];
+    uploadingProfile: string;
+    uploadDate: Date;
+}
 
