@@ -1,5 +1,6 @@
 ﻿
 using Raven.Client.Documents;
+using System;
 using System.Diagnostics;
 using System.IO;
 
@@ -31,7 +32,9 @@ public class EstimationService : IEstimationService
         int totalFrames = 0;
         string? estimationScriptLocation = _configuration["EstimationScriptLocation"];
         string? overridePython = _configuration["OverridePythonVersion"];
-        Process estimationProcess = new Process{
+        Exception exception = null;
+        Process estimationProcess = new Process
+        {
             StartInfo = new ProcessStartInfo
             {
                 FileName = string.IsNullOrEmpty(overridePython) ? "python" : overridePython,
@@ -43,33 +46,43 @@ public class EstimationService : IEstimationService
             },
             EnableRaisingEvents = true,
         };
-        estimationProcess.OutputDataReceived += (se, ev) => {
+        estimationProcess.OutputDataReceived += (se, ev) =>
+        {
             _logger.Log(LogLevel.Information, ev.Data);
-            if (ev.Data != null) {
-                if (totalFrames == 0 && ev.Data.Contains("Total Frames:")) {
+            if (ev.Data != null)
+            {
+                if (totalFrames == 0 && ev.Data.Contains("Total Frames:"))
+                {
                     totalFrames = int.Parse(ev.Data.Split(':').Last());
                 }
                 if (ev.Data.Contains("Frame") && ev.Data.Contains("processed") || ev.Data.Contains($"/{totalFrames}")) // before or is infer2d after or is run.py
-                { 
+                {
                     // bubble progress event to frontend 
                 }
             }
         };
-        estimationProcess.ErrorDataReceived += (se, ev) => {
+        estimationProcess.ErrorDataReceived += (se, ev) =>
+        {
             _logger.Log(LogLevel.Error, ev.Data);
-            if (ev.Data != null) {
-                if (ev.Data.Contains("Invalid result in")) {
-                    throw new Exception(ev.Data);
+            if (ev.Data != null)
+            {
+                if (ev.Data.Contains("Invalid result in"))
+                {
+                    exception = new Exception(ev.Data);
                 }
                 // todo other errors might occur but harmless, still have to handle them
-                
             }
         };
-
+        
         estimationProcess.Start();
         estimationProcess.BeginOutputReadLine();
         estimationProcess.BeginErrorReadLine();
         estimationProcess.WaitForExit();
+
+        if (exception != null) { 
+            throw exception;
+        }
+
         return;
     }
 
