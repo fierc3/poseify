@@ -11,7 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IEstimationHandler, EstimationHandler>();
+builder.Services.AddScoped<IEstimationService, EstimationService>();
 
 builder.Services.AddProblemDetails();
 

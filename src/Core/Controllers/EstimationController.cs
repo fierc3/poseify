@@ -8,14 +8,14 @@ namespace Backend.Controllers {
 
     [ApiController]
     [Route("[controller]")]
-    public class UploadController : ControllerBase
+    public class EstimationController : ControllerBase
     {
 
-        private readonly ILogger<UploadController> _logger;
-        private readonly IEstimationHandler _estimationHandler;
+        private readonly ILogger<EstimationController> _logger;
+        private readonly IEstimationService _estimationHandler;
         private readonly IConfiguration _configuration;
 
-        public UploadController(ILogger<UploadController> logger, IEstimationHandler estimationHandler, IConfiguration configuration)
+        public EstimationController(ILogger<EstimationController> logger, IEstimationService estimationHandler, IConfiguration configuration)
         {
             _logger = logger;
             _estimationHandler = estimationHandler;
