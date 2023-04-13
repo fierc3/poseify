@@ -57,7 +57,6 @@ public class EstimationService : IEstimationService
         };
         estimationProcess.ErrorDataReceived += (se, ev) => {
             _logger.Log(LogLevel.Error, ev.Data);
-            // todo propper error parsing, disabled ffmpeg verbosity so now only propper errors are printed
             if (ev.Data != null) {
                 if (ev.Data.Contains("Invalid result in")) {
                     throw new Exception(ev.Data);
