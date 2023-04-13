@@ -1,11 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Raven.Client.Documents;
 using System.Collections.Generic;
 using static Raven.Client.Constants;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Backend.Controllers { 
+namespace Backend.Controllers {
 
+    [Authorize]
     [ApiController]
     [Route("api/[controller]/[action]")]
     public class EstimationController : ControllerBase
