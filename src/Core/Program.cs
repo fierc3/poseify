@@ -1,3 +1,5 @@
+using Microsoft.IdentityModel.Tokens;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -14,6 +16,17 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddProblemDetails();
 
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.Authority = "https://demo.duendesoftware.com";
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = false
+        };
+    }
+    );
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -28,6 +41,8 @@ app.UseHttpsRedirection();
 app.UseExceptionHandler();
 
 app.UseCors();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
