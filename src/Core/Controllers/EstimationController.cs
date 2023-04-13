@@ -26,7 +26,6 @@ namespace Backend.Controllers {
         [HttpGet(Name = "GetEstimation")]
         public ActionResult<Estimation> Get(string userGuid, string fileName, string fileExtension, string displayName, IEnumerable<string>? tags)
         {
-            // assuming can only be called if user exists in db, so user_id isnt being checked
             string? directory = _configuration["UploadDirectory"];
             Estimation? estimation;
             try
