@@ -35,7 +35,7 @@ public class TagHandler : ITagHandler
 
     public IEnumerable<Tag> GetTagsFromGuid(IEnumerable<string> tagGuids)
     {
-        IEnumerable<Tag>? tags = null;
+        IEnumerable<Tag> tags = new List<Tag>();
         using (var session = _store.OpenSession())
         {
             tags = session.Query<Tag>().Where(x => tagGuids.Contains(x.InternalGuid));
