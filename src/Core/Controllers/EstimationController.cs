@@ -7,7 +7,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace Backend.Controllers { 
 
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]/[action]")]
     public class EstimationController : ControllerBase
     {
 
@@ -21,7 +21,8 @@ namespace Backend.Controllers {
             _estimationHandler = estimationHandler;
             _configuration = configuration;
         }
-
+        
+        [ActionName("GetEstimation")]
         [HttpGet(Name = "GetEstimation")]
         public ActionResult<Estimation> Get(string userGuid, string fileName, string fileExtension, string displayName, IEnumerable<string>? tags)
         {
@@ -41,25 +42,26 @@ namespace Backend.Controllers {
 
         // ---- only for testing purposes ----
 
-        //[HttpGet(Name = "GetEstimation")]
-        //public ActionResult<Estimation> Get()
-        //{
-        //    // assuming this can only happen if user exists in db, so user_id isnt being checked
-        //    string userGuid = "DEEZNUZ";
-        //    string fileName = "test_man";
-        //    string fileExtension = "mp4";
-        //    string displayName = "test1";
-        //    string? directory = _configuration["UploadDirectory"];
-        //    Estimation? estimation;
-        //    try
-        //    {
-        //        estimation = _estimationHandler.HanldeUploadedFile(userGuid, directory, fileName, fileExtension, displayName, null);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Problem($"A problem occured when trying to convert input with VideoPose3D\nDetail:{ex}");
-        //    }
-        //    return estimation;
-        //}
+        [ActionName("GetEstimationTest")]
+        [HttpGet(Name = "GetEstimationTest")]
+        public ActionResult<Estimation> Get()
+        {
+            // assuming this can only happen if user exists in db, so user_id isnt being checked
+            string userGuid = "DEEZNUZ";
+            string fileName = "test_man";
+            string fileExtension = "mp4";
+            string displayName = "test1";
+            string? directory = _configuration["UploadDirectory"];
+            Estimation? estimation;
+            try
+            {
+                estimation = _estimationHandler.HanldeUploadedFile(userGuid, directory, fileName, fileExtension, displayName, null);
+            }
+            catch (Exception ex)
+            {
+                return Problem($"A problem occured when trying to convert input with VideoPose3D\nDetail:{ex}");
+            }
+            return estimation;
+        }
     }
 }
