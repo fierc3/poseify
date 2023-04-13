@@ -3,13 +3,13 @@ using Raven.Client.Documents;
 using System.Diagnostics;
 using System.IO;
 
-public class EstimationHandler : IEstimationHandler
+public class EstimationService : IEstimationService
 {
-    private readonly ILogger<EstimationHandler> _logger;
+    private readonly ILogger<EstimationService> _logger;
     private readonly IDocumentStore _store;
     private readonly IConfiguration _configuration;
 
-    public EstimationHandler(ILogger<EstimationHandler> logger, IConfiguration configuration)
+    public EstimationService(ILogger<EstimationService> logger, IConfiguration configuration)
     {
         _logger = logger;
         _store = DocumentStoreHolder.Store;

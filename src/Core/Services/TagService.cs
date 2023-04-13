@@ -4,12 +4,12 @@ using System.IO;
 using System.Xml.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-public class TagHandler : ITagHandler
+public class TagService : ITagService
 {
-    private readonly ILogger<TagHandler> _logger;
+    private readonly ILogger<TagService> _logger;
     private readonly IDocumentStore _store;
 
-    public TagHandler(ILogger<TagHandler> logger)
+    public TagService(ILogger<TagService> logger)
     {
         _logger = logger;
         _store = DocumentStoreHolder.Store;
