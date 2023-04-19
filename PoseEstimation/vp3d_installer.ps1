@@ -1,0 +1,133 @@
+
+#########################################################
+# Copyright Maroccan Money Squad and Bulgarians in Lidl #
+#########################################################
+
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+$python_url = "https://www.python.org/ftp/python/3.7.9/python-3.7.9.exe"
+$git_url = "https://github.com/git-for-windows/git/releases/download/v2.39.2.windows.1/Git-2.39.2-64-bit.exe"
+$vp3d_url = "https://github.com/MadMeister/VideoPose3D_poseify.git"
+$msbuild_url = "https://aka.ms/vs/17/release/vs_buildtools.exe"
+$detectron_url = "git+https://github.com/facebookresearch/detectron2.git"
+$pretrained_model_url = "https://dl.fbaipublicfiles.com/video-pose-3d/pretrained_h36m_detectron_coco.bin"
+
+$python_dest = "C:\Python37"
+$git_dest = "C:\Program Files\Git"
+$vp3d_dest = "Split-Path -parent $PSCommandPath"
+$msbuild_dest = "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin"
+$pretrained_model_dest = "$vp3d_dest\checkpoint"
+
+
+"This Script will install the following things:
+    - python 3.7.9 in $python_dest
+    - git in $git_dest
+    - videopose3d in $vp3d_dest
+    - msbuildtools c++ in $msbuild_dest
+    - detectron and various python libraries
+
+if you would like to change any paths please edit the paths in this powershell script"
+
+$python_conf = Read-Host "do you want to install python to $python_dest ? (y/n)"
+
+if ($python_conf -eq 'y'){
+    if (-Not(Test-Path -Path $python_dest)){
+        try{
+            "installing python"
+            Invoke-WebRequest -Uri $python_url -OutFile $python_dest
+            $pythonExePath = "$python_dest\python-3.7.9.exe"
+            Start-Process $pythonExePath -Wait -ArgumentList '/quiet InstallAllUsers=0 PrependPath=1 Include_test=0'
+        }catch{
+            Write-Host "error while downloading and installing python"
+            Write-Host $_
+        }
+    }
+    else{
+        "python path already exists, skipping installation"
+    }
+}
+
+$git_conf = Read-Host "do you want to install git to $git_dest ? (y/n)"
+
+if ($git_conf -eq 'y'){
+    if (-Not(Test-Path $git_dest)){
+        try{
+            "installing git"
+            Invoke-WebRequest -Uri $git_url -OutFile $git_dest
+            $gitExePath = "$git_dest\git.exe"
+            Start-Process $gitExePath -Wait -ArgumentList '/NORESTART /NOCANCEL /SP- /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /COMPONENTS="icons,ext\reg\shellhere,assoc,assoc_sh" /LOG="C:\git-for-windows.log"'
+        }catch{
+            Write-Host "error while downloading and installing git"
+            Write-Host $_
+        }
+        else{
+            "git path already exists, skipping installation"
+        }
+    }
+}
+
+$msbuild_conf = Read-Host "do you want to install msbuildtools to $msbuild_dest ? (y/n)"
+
+if ($msbuild_conf -eq 'y'){
+    if (-Not(Test-Path $msbuild_dest)){
+        try{
+            "installing msbuildtools"
+            $msbuildExePath = "$msbuild_dest\vs_buildtools.exe"
+            Invoke-WebRequest -Uri $msbuild_url -OutFile  $msbuild_dest 
+
+            $buildtoolargs = " --quiet --norestart --wait --add Microsoft.VisualStudio.Workload.MSBuildTools --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.VC.CMake.Project --add Microsoft.VisualStudio.Component.VC.ASAN"
+            Start-Process $msbuildExePath -ArgumentList $buildtoolargs -Wait -PassThru -WorkingDirectory $msbuild_dest -NoNewWindow
+        }catch{
+            Write-Host "error while downloading and installing msbuildtools"
+            Write-Host $_
+        }
+    }
+    else{
+        "msbuildtools path already exists, skipping installation"
+    }
+}
+
+$vp3d_conf = Read-Host "do you want to install videopose3d to $vp3d_dest ? (y/n)"
+
+if ($vp3d_conf -eq 'y'){
+    if (-Not(Test-Path $vp3d_dest)){
+        try{
+            "installing vp3d"
+            git clone $vp3d_url $vp3d_dest
+        }catch{
+            Write-Host "error while downloading and installing vp3d"
+            Write-Host $_
+        }
+    }
+    else{
+        "vp3d path already exists, skipping installation"
+    }
+}
+
+$model_conf = Read-Host "do you want to download the pretrained model for vp3d? (y/n)"
+
+if ($model_conf -eq 'y'){
+    try{
+        "downloading pretrained vp3d model"
+        Invoke-WebRequest -Uri $pretrained_model_url -OutFile $pretrained_model_dest 
+    }catch{
+        Write-Host "error while downloading and installing vp3d model"
+        Write-Host $_
+    }
+}
+
+$req_conf = Read-Host "do you want to install detectron2 and all python requirements for videopose3d? as specified in .\requirements.txt ? (y/n)"
+
+if ($req_conf -eq 'y'){
+    try{
+        "installing requirements"
+        python -m pip install $detectron_url
+        python -m pip install -r .\requirements.txt
+    }catch{
+        Write-Host "error while downloading and installing detectron2 and or requirements"
+        Write-Host $_
+    }
+}
+
+"IM WELL AND TRULY FINISHED"
+Read-Host
