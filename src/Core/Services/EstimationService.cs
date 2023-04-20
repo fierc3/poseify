@@ -19,6 +19,16 @@ namespace Core.Services
             _configuration = configuration;
         }
 
+
+        public IEnumerable<Estimation> GetAllUserEstimations(string userGuid) 
+        {
+            List<Estimation> estimations = new List<Estimation>();
+            using (var session = _store.OpenSession()) {
+                estimations = session.Query<Estimation>().Where(x => x.UploadingProfile == userGuid).ToList();
+            }
+            return estimations;
+        }    
+    
         public Estimation HandleUploadedFile(string userGuid, string directory, string fileName, string fileExtension, string displayName, IEnumerable<Tag>? tags)
         {
             RunEstimation(userGuid, directory, fileName, fileExtension);
