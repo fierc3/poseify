@@ -1,4 +1,6 @@
 ﻿
+using Core.Models;
+
 public interface ITagService
 {
     public Tag CreateTag(string name);

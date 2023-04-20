@@ -1,56 +1,59 @@
-﻿using Raven.Client.Documents;
+﻿using Core.Models;
+using Raven.Client.Documents;
 using System;
 using System.IO;
 using System.Xml.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-public class TagService : ITagService
+namespace Core.Services
 {
-    private readonly ILogger<TagService> _logger;
-    private readonly IDocumentStore _store;
-
-    public TagService(ILogger<TagService> logger)
+    public class TagService : ITagService
     {
-        _logger = logger;
-        _store = DocumentStoreHolder.Store;
-    }
+        private readonly ILogger<TagService> _logger;
+        private readonly IDocumentStore _store;
 
-    public Tag CreateTag(string name)
-    {
-        string guid = Guid.NewGuid().ToString();
-        Tag? tag = null;
-        using (var session = _store.OpenSession())
+        public TagService(ILogger<TagService> logger)
         {
-            tag = new()
+            _logger = logger;
+            _store = DocumentStoreHolder.Store;
+        }
+
+        public Tag CreateTag(string name)
+        {
+            string guid = Guid.NewGuid().ToString();
+            Tag? tag = null;
+            using (var session = _store.OpenSession())
             {
-                InternalGuid = guid,
-                DisplayName = name,
-            };
-            session.Store(tag, guid);
-            session.SaveChanges();
-            tag = session.Query<Tag>().Where(x => x.InternalGuid == guid).FirstOrDefault();
+                tag = new()
+                {
+                    InternalGuid = guid,
+                    DisplayName = name,
+                };
+                session.Store(tag, guid);
+                session.SaveChanges();
+                tag = session.Query<Tag>().Where(x => x.InternalGuid == guid).FirstOrDefault();
+            }
+            return tag;
         }
-        return tag;
-    }
 
-    public IEnumerable<Tag> GetTagsFromGuid(IEnumerable<string> tagGuids)
-    {
-        IEnumerable<Tag> tags = new List<Tag>();
-        using (var session = _store.OpenSession())
+        public IEnumerable<Tag> GetTagsFromGuid(IEnumerable<string> tagGuids)
         {
-            tags = session.Query<Tag>().Where(x => tagGuids.Contains(x.InternalGuid));
+            IEnumerable<Tag> tags = new List<Tag>();
+            using (var session = _store.OpenSession())
+            {
+                tags = session.Query<Tag>().Where(x => tagGuids.Contains(x.InternalGuid));
+            }
+            return tags;
         }
-        return tags;
-    }
 
-    public Tag GetTagsFromGuid(string tagGuid)
-    {
-        Tag? tag = null;
-        using (var session = _store.OpenSession())
+        public Tag GetTagsFromGuid(string tagGuid)
         {
-            tag = session.Query<Tag>().Where(x => x.InternalGuid == tagGuid).FirstOrDefault();
+            Tag? tag = null;
+            using (var session = _store.OpenSession())
+            {
+                tag = session.Query<Tag>().Where(x => x.InternalGuid == tagGuid).FirstOrDefault();
+            }
+            return tag;
         }
-        return tag;
     }
 }
-

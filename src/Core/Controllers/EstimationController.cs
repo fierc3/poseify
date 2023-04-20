@@ -1,10 +1,12 @@
+using Core.Models;
 using Microsoft.AspNetCore.Mvc;
 using Raven.Client.Documents;
 using System.Collections.Generic;
 using static Raven.Client.Constants;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Backend.Controllers { 
+namespace Backend.Controllers
+{
 
     [ApiController]
     [Route("api/[controller]/[action]")]
@@ -27,10 +29,16 @@ namespace Backend.Controllers {
         public ActionResult<Estimation> Get(string userGuid, string fileName, string fileExtension, string displayName, IEnumerable<string>? tags)
         {
             string? directory = _configuration["UploadDirectory"];
+
+            if (directory == null)
+            {
+                return Problem("Upload Directory is not defined");
+            }
+
             Estimation? estimation;
             try
             {
-                estimation = _estimationHandler.HanldeUploadedFile(userGuid, directory, fileName, fileExtension, displayName, null);
+                estimation = _estimationHandler.HandleUploadedFile(userGuid, directory, fileName, fileExtension, displayName, null);
             }
             catch (Exception ex)
             {
@@ -54,7 +62,7 @@ namespace Backend.Controllers {
             Estimation? estimation;
             try
             {
-                estimation = _estimationHandler.HanldeUploadedFile(userGuid, directory, fileName, fileExtension, displayName, null);
+                estimation = _estimationHandler.HandleUploadedFile(userGuid, directory, fileName, fileExtension, displayName, null);
             }
             catch (Exception ex)
             {
