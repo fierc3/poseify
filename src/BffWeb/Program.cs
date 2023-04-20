@@ -64,5 +64,8 @@ app.UseAuthorization();
 
 app.MapBffManagementEndpoints();
 
+app.MapRemoteBffApiEndpoint("/api/GetEstimationTest", "https://localhost:5034/api/Estimation/GetEstimationTest")
+          .RequireAccessToken();
+
 
 app.Run();

@@ -1,8 +1,10 @@
+using Core.Models;
 using Microsoft.AspNetCore.Mvc;
 using Raven.Client.Documents;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Backend.Controllers { 
+namespace Backend.Controllers
+{
 
     [ApiController]
     [Route("[controller]")]
