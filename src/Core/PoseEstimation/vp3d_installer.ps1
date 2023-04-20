@@ -14,7 +14,7 @@ $pretrained_model_url = "https://dl.fbaipublicfiles.com/video-pose-3d/pretrained
 
 $python_dest = "C:\Python37"
 $git_dest = "C:\Program Files\Git"
-$vp3d_dest = "Split-Path -parent $PSCommandPath"
+$vp3d_dest = Split-Path -parent $PSCommandPath
 $msbuild_dest = "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin"
 $pretrained_model_dest = "$vp3d_dest\checkpoint"
 
