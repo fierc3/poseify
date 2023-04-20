@@ -60,12 +60,13 @@ namespace Backend.Controllers
             {
                 return Problem($"A problem occured when trying to fetch user uploads:{ex}");
             }
+        }
 
         // ---- only for testing purposes ----
 
         [ActionName("GetEstimationTest")]
         [HttpGet(Name = "GetEstimationTest")]
-        public ActionResult<Estimation> Get()
+        public ActionResult<Estimation> GetTest()
         {
             // assuming this can only happen if user exists in db, so user_id isnt being checked
             string userGuid = "DEEZNUZ";
