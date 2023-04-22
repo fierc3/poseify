@@ -13,7 +13,7 @@ const config = {
 }
 
 const fetchData = async () =>
-  axios.get('/api/GetUserEstimations?userGuid=1', config)
+  axios.get('/api/GetUserEstimations', config)
     .then((res) => res.data as  IEstimation[]);
 
 
