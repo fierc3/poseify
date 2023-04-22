@@ -1,12 +1,9 @@
 import { ProgressIndicator, Stack, ThemeProvider } from "@fluentui/react";
-import { Text, ITextProps } from "@fluentui/react/lib/Text";
+import { Text } from "@fluentui/react/lib/Text";
 import { EstimationList } from "../../components/estimation-list/estimation-list";
-import { contentDarkTheme } from "../../themes/content-theme-dark";
 import { navigationDarkTheme } from "../../themes/navigation-theme-dark";
 
 const Dashboard = () => {
-
-  const {data: estimations} = useEstimations();
   return (
     <div className="App">
       <Stack horizontal>
