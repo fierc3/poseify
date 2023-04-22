@@ -10,6 +10,7 @@ namespace Core.Models
         public string DisplayName { get; set; } = "";
         public IEnumerable<string>? Tags { get; set; } = new List<string>();
         public string UploadingProfile { get; set; } = "";
-        public DateTime UploadDate { get; set; } = DateTime.Now;
+        public DateTime ModifiedDate { get; set; } = DateTime.Now;
+        public EstimationState State { get; set; } 
     }
 }

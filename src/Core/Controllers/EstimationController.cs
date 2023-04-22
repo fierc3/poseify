@@ -1,9 +1,5 @@
 using Core.Models;
 using Microsoft.AspNetCore.Mvc;
-using Raven.Client.Documents;
-using System.Collections.Generic;
-using static Raven.Client.Constants;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Backend.Controllers
 {
@@ -74,6 +70,11 @@ namespace Backend.Controllers
             string fileExtension = "mp4";
             string displayName = "test1";
             string? directory = _configuration["UploadDirectory"];
+
+            if (directory == null) {
+                return Problem("Configuration issue, missing UploadDirectory");
+            }
+
             Estimation? estimation;
             try
             {

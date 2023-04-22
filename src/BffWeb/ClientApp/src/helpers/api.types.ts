@@ -23,11 +23,18 @@ export interface IProblemDetails {
     [key: string]: any;
 }
 
+enum EstimationState{
+    Success = "Sucess",
+    Processing ="Processing",
+    Failed = "Failed"
+}
+
 export interface IEstimation {
     internalGuid: string;
     displayName: string;
     tags: string[];
     uploadingProfile: string;
-    uploadDate: Date;
+    modifiedDate: Date;
+    state: EstimationState
 }
 

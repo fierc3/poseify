@@ -27,15 +27,60 @@ namespace Core.Services
                 estimations = session.Query<Estimation>().Where(x => x.UploadingProfile == userGuid).ToList();
             }
             return estimations;
-        }    
+        }
+        
+        public Estimation? RegisterEstimation(string displayName, IEnumerable<Tag>? tags, string userGuid) {
+            string guid = Guid.NewGuid().ToString();
+            Estimation? estimation = null;
+
+            using (var session = _store.OpenSession())
+            {
+                estimation = new()
+                {
+                    InternalGuid = guid,
+                    DisplayName = displayName,
+                    Tags = tags?.Select(x => x.InternalGuid).ToList(),
+                    UploadingProfile = userGuid,
+                    ModifiedDate = DateTime.Now,
+                    State = EstimationState.Processing
+                };
+                session.Store(estimation, guid);
+                session.SaveChanges();
+                estimation = session.Query<Estimation>().Where(x => x.InternalGuid == guid).FirstOrDefault();
+            }
+            return estimation;
+        }
+
+        public void UpdateEstimation(Estimation editedEstimation)
+        {
+            using var session = _store.OpenSession();
+            session.Store(editedEstimation, editedEstimation.InternalGuid);
+            session.SaveChanges();
+        }
     
         public Estimation HandleUploadedFile(string userGuid, string directory, string fileName, string fileExtension, string displayName, IEnumerable<Tag>? tags)
         {
-            RunEstimation(userGuid, directory, fileName, fileExtension);
+            var estimation = RegisterEstimation(displayName, tags, userGuid);
+            if(estimation == null)
+            {
+                throw new Exception("Estimation could not be registed");
+            }
+            try
+            {
+                RunEstimation(userGuid, directory, fileName, fileExtension);
+            }
+            catch
+            {
+                estimation.State = EstimationState.Failed;
+                UpdateEstimation(estimation);
+                throw;
+            }
+
             string fileLocation = $"{directory}\\{userGuid}\\{fileName}";
             string estimationPath = $"{fileLocation}.{fileExtension}.npz";
             string previewPath = $"{fileLocation}_result.mp4";
-            Estimation estimation = StoreEstimationResultToDb(userGuid, estimationPath, previewPath, fileName, tags, displayName);
+
+            StoreEstimationResultToDb(estimation, estimationPath, previewPath, fileName);
             File.Delete($"{fileLocation}.mp4");
             return estimation;
         }
@@ -98,30 +143,24 @@ namespace Core.Services
         }
 
         //create a new estimation entry and attach a file to it
-        private Estimation StoreEstimationResultToDb(string userGuid, string estimationPath, string previewPath, string file_name, IEnumerable<Tag>? tags, string display_name)
+        private void StoreEstimationResultToDb(Estimation estimation, string estimationPath, string previewPath, string file_name)
         {
-            string guid = Guid.NewGuid().ToString();
-            Estimation? estimation = null;
+            if(estimation == null)
+            {
+                throw new Exception("Estimation is missing");
+            }
 
+            string guid = estimation.InternalGuid;
             using (var session = _store.OpenSession())
             using (var estimationFile = File.Open(estimationPath, FileMode.Open))
             using (var previewFile = File.Open(previewPath, FileMode.Open))
             {
-                estimation = new()
-                {
-                    InternalGuid = guid,
-                    DisplayName = display_name,
-                    Tags = tags?.Select(x => x.InternalGuid).ToList(),
-                    UploadingProfile = userGuid,
-                    UploadDate = DateTime.Now
-                };
+                estimation.State = EstimationState.Success;
                 session.Store(estimation, guid);
                 session.Advanced.Attachments.Store(guid, $"{file_name}.npz", estimationFile);
                 session.Advanced.Attachments.Store(guid, $"{file_name}_result.mp4", previewFile);
                 session.SaveChanges();
-                estimation = session.Query<Estimation>().Where(x => x.InternalGuid == guid).FirstOrDefault();
             }
-            return estimation;
         }
     }
 }
