@@ -71,7 +71,8 @@ def estimate_pose_for_video(file_dir, user_id, guid, file_extension, new_file_ex
         input_video_location = ffmpeg_conversion(input_video_location, file_user_guid, new_file_extension, scale_fps)
         file_extension = new_file_extension or file_extension
     
-    wdir = os.path.dirname(os.path.realpath(__file__))
+    wdir = os.path.dirname(os.path.realpath(__file__)) + '\\vp3d'
+    print(f'Wokring directory for vp3d: {wdir}')
 
     print(f'Total Frames: {get_frame_count(input_video_location)}')
     command = f'python {wdir}\\inference\\infer_video_d2.py --cfg COCO-Keypoints/keypoint_rcnn_R_101_FPN_3x.yaml --output-dir {directory} --image-ext {file_extension} {input_video_location}'
