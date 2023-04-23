@@ -1,50 +1,41 @@
-import { ProgressIndicator, Stack, ThemeProvider } from "@fluentui/react";
-import { Text } from "@fluentui/react/lib/Text";
 import { EstimationList } from "../../components/estimation-list/estimation-list";
-import { navigationDarkTheme } from "../../themes/navigation-theme-dark";
+import { Box, LinearProgress, Paper, Stack, Typography } from "@mui/material";
 
 const Dashboard = () => {
   return (
-    <div className="App">
-      <Stack horizontal>
-        <Stack.Item grow={5}>
-          <Stack
-            horizontalAlign="center"
-            verticalAlign="space-evenly"
-            style={{ minHeight: 300 }}
-          >
-            <Stack.Item>
-              <Text variant="mega">Place holder</Text>
-            </Stack.Item>
+    <Stack sx={{ width: "100vw", height: "90vh" }} direction="column" gap={1} flexWrap="wrap">
+      <Stack  flexGrow={1} spacing={{ xs: 1, sm: 2 }} direction="row" useFlexGap flexWrap="wrap">
+        <Box flexGrow={7} sx={{ }}>
+          <Typography variant="h5">
+            Upload Place Holder
+          </Typography>
+        </Box>
+        <Paper sx={{ display: { xs: 'none', sm: 'block' } }} style={{ backgroundColor: "black", flexGrow: 3, marginTop: -3, alignContent: "center" }}>
+          <Stack flexGrow={1} spacing={{ xs: 3, sm: 4 }} direction="column" useFlexGap flexWrap="wrap" paddingTop={2}>
+            <Box>
+              <Typography color={"white"} alignContent={"center"} variant="subtitle1">
+                Daily Limit
+              </Typography>
+              <LinearProgress color="secondary" variant="determinate" value={20} sx={{ width: "50%", marginLeft: "25%" }} />
+              <Typography color={"white"} alignContent={"center"} variant="subtitle2">
+                Used x out of y
+              </Typography>
+            </Box>
+            <Box>
+            <Typography color={"white"} alignContent={"center"} variant="h5" >
+              Need more Uploads?
+            </Typography>
+            <Typography color={"white"} alignContent={"center"} variant="subtitle1" >
+            <a href="https://google.com">Contact</a> us to request more uploads 
+            </Typography>
+            </Box>
           </Stack>
-          <Stack>
-            <EstimationList />
-          </Stack>
-        </Stack.Item>
-        <Stack.Item grow={1}>
-          <ThemeProvider theme={navigationDarkTheme}>
-            <Stack
-              verticalAlign="start"
-              style={{ width: 200, height: "87vh" }}
-            >
-              <Stack horizontal>
-                <Stack.Item
-                  grow={1}
-                  style={{ paddingLeft: 10, paddingRight: 10 }}
-                >
-                  <ProgressIndicator
-                    styles={{ progressTrack: { backgroundColor: "white" } }}
-                    label="Daily Limit"
-                    description="Used x out of 10"
-                    percentComplete={0.5}
-                  />
-                </Stack.Item>
-              </Stack>
-            </Stack>
-          </ThemeProvider>
-        </Stack.Item>
+        </Paper>
       </Stack>
-    </div>
+      <Box flexGrow={6} sx={{ width: "100vw" }}>
+        <EstimationList />
+      </Box>
+    </Stack>
   );
 };
 
