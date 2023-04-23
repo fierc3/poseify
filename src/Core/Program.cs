@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(p => { p.WithOrigins("http://localhost:3000", "https://localhost:3000"); });
+    options.AddDefaultPolicy(p => { p.WithOrigins("http://localhost:7184", "https://localhost:7184"); });
 });
 
 builder.Services.AddControllers();
@@ -16,6 +17,22 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IEstimationService, EstimationService>();
 
 builder.Services.AddProblemDetails();
+
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "https://localhost:7184";
+        options.TokenValidationParameters.ValidateAudience = false;
+    });
+
+builder.Services.AddAuthorization(options =>
+    options.AddPolicy("ApiScope", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("scope", "poseifyApiScope");
+    })
+);
+
 
 var app = builder.Build();
 
@@ -32,8 +49,9 @@ app.UseExceptionHandler();
 
 app.UseCors();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapControllers().RequireAuthorization("ApiScope");
 
 app.Run();
