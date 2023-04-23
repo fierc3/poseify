@@ -23,8 +23,8 @@ export interface IProblemDetails {
     [key: string]: any;
 }
 
-enum EstimationState{
-    Success = "Sucess",
+export enum EstimationState{
+    Success = "Success",
     Processing ="Processing",
     Failed = "Failed"
 }
