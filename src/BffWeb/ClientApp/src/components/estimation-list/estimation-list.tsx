@@ -1,105 +1,90 @@
-import {
-  DetailsList,
-  DetailsListLayoutMode,
-  IColumn,
-  SelectionMode,
-} from "@fluentui/react";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
+import useEstimations from "../../helpers/estimations";
+import { EstimationState, IEstimation } from "../../helpers/api.types";
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import moment from "moment";
+import ProcessingIcon from '@mui/icons-material/DirectionsRun';
+import SuccessIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import { Button } from "@mui/material";
 
 export const EstimationList: FC = () => {
-  const columns: IColumn[] = [
+  const { data: rawEstimations, isFetched } = useEstimations();
+  const [estimations, setEstimations] = useState<IEstimation[]>([]);
+  const [isDataLoaded, setDataLoad] = useState<boolean>(false);
+  /*          
+           }) */
+  const startColumns: GridColDef[] = [
     {
-      key: "nameCol",
-      name: "Name",
-      fieldName: "name",
-      minWidth: 210,
-      maxWidth: 350,
-      isRowHeader: true,
-      isResizable: true,
-      isSorted: true,
-      isSortedDescending: false,
-      sortAscendingAriaLabel: "Sorted A to Z",
-      sortDescendingAriaLabel: "Sorted Z to A",
-      data: "string",
-      isPadded: true,
+      field: "displayName",
+      headerName: "Estimation",
+      flex: 8
     },
     {
-      key: "stateCol",
-      name: "State",
-      fieldName: "state",
-      minWidth: 210,
-      maxWidth: 350,
-      isRowHeader: true,
-      isResizable: true,
-      isSorted: true,
-      isSortedDescending: false,
-      sortAscendingAriaLabel: "Sorted A to Z",
-      sortDescendingAriaLabel: "Sorted Z to A",
-      data: "string",
-      isPadded: true,
+      headerName: "State",
+      field: "state",
+      flex: 3,
+      renderCell: (params) => {
+        return (<>
+          {params.value === EstimationState.Processing && (<ProcessingIcon color="action" />)}
+          {params.value === EstimationState.Failed && (<ErrorIcon color="error" />)}
+          {params.value === EstimationState.Success && (<SuccessIcon color="success" />)}
+        </>)
+      }
     },
     {
-      key: "fileSizeCol",
-      name: "File Size",
-      fieldName: "fileSizeRaw",
-      minWidth: 70,
-      maxWidth: 90,
-      isResizable: true,
-      isCollapsible: true,
-      data: "number",
+      headerName: "Tags",
+      field: "tags",
+      flex: 4
     },
     {
-      key: "dateModifiedCol",
-      name: "Date Modified",
-      fieldName: "dateModifiedValue",
-      minWidth: 70,
-      maxWidth: 90,
-      isResizable: true,
-      data: "number",
-      isPadded: true,
+      headerName: "Last Modifed",
+      field: "modifiedDate",
+      align: "right",
+      minWidth: 150,
+      flex: 3,
+      valueFormatter: (params) => moment(params.value).fromNow()
     },
+    {
+      headerName: "",
+      field: "actions",
+      align: "right",
+      minWidth: 150,
+      flex: 3,
+      renderCell: (params) => {
+        return (<>
+          <Button
+            onClick={(e) => console.log("tbi")}
+            variant="contained"
+          >
+            View
+          </Button>
+          <Button
+            onClick={(e) => console.log("tbi")}
+            variant="contained"
+          >
+            Delete
+          </Button>
+        </>)
+      }
+    }
   ];
+
+
+
+
+
+  useEffect(() => {
+    setEstimations(rawEstimations ?? []);
+    setDataLoad(isFetched);
+    //only interested in estimate reloads
+    // eslint-disable-next-line react-hooks/exhaustive-deps 
+  }, [rawEstimations]);
+
 
   return (
     <>
-      <DetailsList
-        items={[
-          {
-            name: "Test 1",
-            state: "Processing",
-            fileSizeRaw: 122,
-            dateModifiedValue: 1681374570382,
-          },
-          {
-            name: "Test 2",
-            state: "Processing",
-            fileSizeRaw: 122,
-            dateModifiedValue: 1681374570382,
-          },
-          {
-            name: "Test 3",
-            state: "Processing",
-            fileSizeRaw: 122,
-            dateModifiedValue: 1681374570382,
-          },
-          {
-            name: "Test 4",
-            state: "Processing",
-            fileSizeRaw: 122,
-            dateModifiedValue: 1681374570382,
-          },
-          {
-            name: "Test 5",
-            state: "Processing",
-            fileSizeRaw: 122,
-            dateModifiedValue: 1681374570382,
-          },
-        ]}
-        columns={columns}
-        selectionMode={SelectionMode.none}
-        layoutMode={DetailsListLayoutMode.justified}
-        isHeaderVisible={true}
-      />
+      <DataGrid columnVisibilityModel={{tags:window.innerWidth > 500, modifiedDate: window.innerWidth > 500}} loading={!isDataLoaded} rows={estimations} getRowId={(row: IEstimation) => row.internalGuid} columns={startColumns} />
     </>
   );
 };
