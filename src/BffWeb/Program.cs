@@ -64,7 +64,12 @@ app.UseAuthorization();
 
 app.MapBffManagementEndpoints();
 
-app.MapRemoteBffApiEndpoint("/api/GetEstimationTest", "https://localhost:5034/api/Estimation/GetEstimationTest")
+
+int remoteApiPort = 7236;
+app.MapRemoteBffApiEndpoint("/api/GetEstimationTest", "https://localhost:" + remoteApiPort + "/api/Estimation/GetEstimationTest")
+          .RequireAccessToken();
+
+app.MapRemoteBffApiEndpoint("/api/GetUserEstimations", "https://localhost:" + remoteApiPort + "/api/Estimation/GetUserEstimations")
           .RequireAccessToken();
 
 
