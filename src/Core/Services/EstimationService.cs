@@ -19,7 +19,6 @@ namespace Core.Services
             _configuration = configuration;
         }
 
-
         public IEnumerable<Estimation> GetAllUserEstimations(string userGuid) 
         {
             List<Estimation> estimations = new List<Estimation>();
@@ -63,7 +62,7 @@ namespace Core.Services
             var estimation = RegisterEstimation(displayName, tags, userGuid);
             if(estimation == null)
             {
-                throw new Exception("Estimation could not be registed");
+                throw new Exception("Estimation could not be registered");
             }
             try
             {
