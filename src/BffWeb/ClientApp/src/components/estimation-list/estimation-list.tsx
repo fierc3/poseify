@@ -60,6 +60,7 @@ export const EstimationList: FC = () => {
             View
           </Button>
           <Button
+            sx={{marginLeft: 1}}
             onClick={(e) => console.log("tbi")}
             variant="contained"
           >

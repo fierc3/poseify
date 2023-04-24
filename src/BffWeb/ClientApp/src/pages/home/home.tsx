@@ -1,12 +1,14 @@
 import { FC } from "react";
 import { Divider, Grid, Typography } from "@mui/material";
+import VideoPoseIcon from '@mui/icons-material/DirectionsRun';
+import DotNetIcon from '@mui/icons-material/Terminal';
+import RavenDbIcon from '@mui/icons-material/Storage';
 
 const Home: FC = () => {
   return (
-    <>
-      <Grid sx={{ flexGrow: 1 }} alignItems="center"
+      <Grid width={"100vw"} alignContent={"center"} sx={{ flexGrow: 1 }} alignItems="center"
         justifyContent="center" container spacing={3} paddingTop={4}>
-        <Grid item xs={6}>
+        <Grid item xs={6} maxWidth={"xl"}>
           <Typography variant="h2" sx={{display: { xs: 'none', md: 'block' }}} gutterBottom>
             Welcome to POSEIFY
           </Typography>
@@ -25,13 +27,14 @@ const Home: FC = () => {
             technology can help you achieve your goals.
           </Typography>
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} maxWidth={"xl"}>
         <Divider variant="middle" />
           <Typography variant="h4" paddingTop={3} paddingBottom={3}>
             POSEIFY is powered by
           </Typography>
           <Grid container justifyContent="center" spacing={2}>
             <Grid item xs={3}>
+              <VideoPoseIcon color="secondary" fontSize="large"/>
               <Typography variant="h6" sx={{display: { xs: 'none', md: 'block' }}}>
                 VideoPose3d
               </Typography>
@@ -48,6 +51,7 @@ const Home: FC = () => {
               </Typography>
             </Grid>
             <Grid item xs={3}>
+              <DotNetIcon color="secondary" fontSize="large"/>
               <Typography variant="h6">
                 .NET 7
               </Typography>
@@ -61,6 +65,7 @@ const Home: FC = () => {
               </Typography>
             </Grid>
             <Grid item xs={3}>
+              <RavenDbIcon color="secondary" fontSize="large"/>
               <Typography variant="h6">
                 RavenDB
               </Typography>
@@ -73,7 +78,6 @@ const Home: FC = () => {
           </Grid>
         </Grid>
       </Grid>
-    </>
   );
 };
 
