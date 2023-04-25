@@ -107,6 +107,21 @@ namespace Core.Services
             }
         }
 
+        public void DeleteEstimation(string estimationid)
+        {
+            using (var session = _store.OpenSession())
+            {
+                var estimation = session.Query<Estimation>().Where(x => x.InternalGuid == estimationid).FirstOrDefault();
+                if (estimation == null)
+                {
+                    throw new Exception("Estimation could not be found");
+                }
+
+                session.Delete(estimation);
+                session.SaveChanges();
+            }
+        }
+
         //todo make this async?
         private void RunEstimation(string userGuid, string directory, string fileName, string fileExtension)
         {

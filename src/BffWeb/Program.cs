@@ -81,5 +81,8 @@ app.MapRemoteBffApiEndpoint("/api/Identity/GetIdToken", "https://localhost:" + r
 app.MapRemoteBffApiEndpoint("/api/PostUpload", "https://localhost:" + remoteApiPort + "/api/Upload/PostUpload")
           .RequireAccessToken();
 
+app.MapRemoteBffApiEndpoint("/api/DeleteEstimation", "https://localhost:" + remoteApiPort + "/api/Estimation/DeleteEstimation")
+          .RequireAccessToken();
+
 app.Run();
 
