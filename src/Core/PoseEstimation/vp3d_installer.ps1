@@ -20,15 +20,6 @@ $msbuild_dest = "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\
 $pretrained_model_dest = "$vp3d_dest\checkpoint\pretrained_h36m_detectron_coco.bin"
 
 
-$CheckPointFolder = "$vp3d_dest\checkpoint"
-if (Test-Path -Path $CheckPointFolder) {
-    "Checkpoint folder exists, no reason to create"
-} else {
-    "Checkpoint folder is missing, creating it."
-    mkdir "$vp3d_dest\checkpoint"
-}
-
-
 "This Script will install the following things:
     - python 3.7.9 in $python_dest
     - git in $git_dest
@@ -111,6 +102,14 @@ if ($vp3d_conf -eq 'y') {
     else {
         "vp3d path already exists, skipping installation"
     }
+ $CheckPointFolder = "$vp3d_dest\checkpoint"
+ if (Test-Path -Path $CheckPointFolder) {
+     "Checkpoint folder exists, no reason to create"
+ } else {
+     "Checkpoint folder is missing, creating it."
+     mkdir "$vp3d_dest\checkpoint"
+ }
+
 }
 
 $model_conf = Read-Host "do you want to download the pretrained model for vp3d? (y/n)"
