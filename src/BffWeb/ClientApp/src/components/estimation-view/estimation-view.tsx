@@ -10,6 +10,7 @@ export const EstimationView: FC<{ estimation: IEstimation | null, open: boolean,
 
     useEffect(() => {
         // load preview when possible
+        setPreviewUrl(undefined);
         if (props.estimation == null) return;
         axios.get(`/api/GetAttachment?estimationId=${props.estimation.internalGuid}&attachmentType=${AttachmentType.Preview}`, { responseType: 'arraybuffer', headers: { 'X-CSRF': '1' } }).then(res => {
             const url = window.URL.createObjectURL(new Blob([res.data]));
