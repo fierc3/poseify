@@ -1,4 +1,6 @@
 using Core.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,10 +20,11 @@ builder.Services.AddScoped<IEstimationService, EstimationService>();
 
 builder.Services.AddProblemDetails();
 
-builder.Services.AddAuthentication("Bearer")
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = "https://localhost:7184";
+        options.Authority = "https://localhost:5001";
+        //options.Audience = "https://localhost:44462";
         options.TokenValidationParameters.ValidateAudience = false;
     });
 

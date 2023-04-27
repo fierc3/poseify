@@ -25,7 +25,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddOpenIdConnect("oidc", options =>
 {
-    options.Authority = "https://localhost:7184/";
+    options.Authority = "https://localhost:5001/";
     options.ClientId = "PoseifyBff";
     options.ClientSecret = "secret";
     options.ResponseType = "code";
@@ -36,13 +36,12 @@ builder.Services.AddAuthentication(options =>
     options.Scope.Add("profile");
     options.Scope.Add("poseifyApiScope");
     options.GetClaimsFromUserInfoEndpoint = true;
-    options.MapInboundClaims = false;
+    options.MapInboundClaims = true;
     options.SaveTokens = true;
 
     options.TokenValidationParameters = new()
     {
-        NameClaimType = "name",
-        RoleClaimType = "role"
+        NameClaimType = ClaimTypes.NameIdentifier,
     };
 });
 
