@@ -38,3 +38,8 @@ export interface IEstimation {
     state: EstimationState
 }
 
+export enum AttachmentType{
+    Joints = "Joints",
+    Preview ="Preview"
+}
+

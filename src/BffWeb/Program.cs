@@ -72,5 +72,7 @@ app.MapRemoteBffApiEndpoint("/api/GetEstimationTest", "https://localhost:" + rem
 app.MapRemoteBffApiEndpoint("/api/GetUserEstimations", "https://localhost:" + remoteApiPort + "/api/Estimation/GetUserEstimations")
           .RequireAccessToken();
 
+app.MapRemoteBffApiEndpoint("/api/GetAttachment", "https://localhost:" + remoteApiPort + "/api/Attachment/GetAttachment")
+          .RequireAccessToken();
 
 app.Run();

@@ -7,11 +7,13 @@ import ProcessingIcon from '@mui/icons-material/DirectionsRun';
 import SuccessIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import { Button } from "@mui/material";
+import { EstimationView } from "../estimation-view/estimation-view";
 
 export const EstimationList: FC = () => {
   const { data: rawEstimations, isFetched } = useEstimations();
   const [estimations, setEstimations] = useState<IEstimation[]>([]);
   const [isDataLoaded, setDataLoad] = useState<boolean>(false);
+  const [selectedEstimation, setSelectedEstimation] = useState<IEstimation | null>(null);
   /*          
            }) */
   const startColumns: GridColDef[] = [
@@ -54,15 +56,17 @@ export const EstimationList: FC = () => {
       renderCell: (params) => {
         return (<>
           <Button
-            onClick={(e) => console.log("tbi")}
+            onClick={(e) => setSelectedEstimation(params.row)}
             variant="contained"
+            disabled={params.row.state !== EstimationState.Success}
           >
             View
           </Button>
           <Button
-            sx={{marginLeft: 1}}
+            sx={{ marginLeft: 1 }}
             onClick={(e) => console.log("tbi")}
             variant="contained"
+            disabled={params.row.state === EstimationState.Processing}
           >
             Delete
           </Button>
@@ -71,10 +75,6 @@ export const EstimationList: FC = () => {
     }
   ];
 
-
-
-
-
   useEffect(() => {
     setEstimations(rawEstimations ?? []);
     setDataLoad(isFetched);
@@ -82,10 +82,10 @@ export const EstimationList: FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps 
   }, [rawEstimations]);
 
-
   return (
     <>
-      <DataGrid columnVisibilityModel={{tags:window.innerWidth > 500, modifiedDate: window.innerWidth > 500}} loading={!isDataLoaded} rows={estimations} getRowId={(row: IEstimation) => row.internalGuid} columns={startColumns} />
+      <EstimationView estimation={selectedEstimation} open={selectedEstimation != null} handleClose={() => setSelectedEstimation(null) }/>
+      <DataGrid columnVisibilityModel={{ tags: window.innerWidth > 500, modifiedDate: window.innerWidth > 500 }} loading={!isDataLoaded} rows={estimations} getRowId={(row: IEstimation) => row.internalGuid} columns={startColumns} />
     </>
   );
 };

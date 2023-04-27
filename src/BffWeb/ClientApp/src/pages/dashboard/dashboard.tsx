@@ -16,7 +16,7 @@ const Dashboard = () => {
   }, [data])
 
   return (
-    <Stack sx={{ height: "90vh" }} direction="column" gap={4} flexWrap="wrap">
+    <Stack sx={{ height: "90vh" }} direction="column" gap={4} flexWrap="nowrap">
       <Stack maxWidth="xl" width={"100%"} marginTop={2} alignSelf={"center"} flexGrow={1} spacing={{ xs: 1, sm: 2 }} direction="row" useFlexGap flexWrap="wrap">
         <Box flexGrow={7} sx={{}}>
           <Typography variant="h5" textAlign={"start"} paddingLeft={3}>
@@ -45,7 +45,7 @@ const Dashboard = () => {
           </Stack>
         </Paper>
       </Stack>
-      <Box maxWidth="xl" width={"100%"} alignSelf={"center"} flexGrow={6} sx={{ width: "100vw" }}>
+      <Box height="xl" maxWidth="xl" width={"100%"} alignSelf={"center"} flexGrow={2} sx={{ width: "100vw" }}>
         <EstimationList />
       </Box>
     </Stack>

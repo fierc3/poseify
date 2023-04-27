@@ -1,5 +1,6 @@
 ﻿using Core.Models;
 using Raven.Client.Documents;
+using Raven.Client.Documents.Attachments;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -23,7 +24,7 @@ namespace Core.Services
         {
             List<Estimation> estimations = new List<Estimation>();
             using (var session = _store.OpenSession()) {
-                estimations = session.Query<Estimation>().Where(x => x.UploadingProfile == userGuid).ToList();
+                estimations = session.Query<Estimation>().Where(x => x.UploadingProfile == userGuid).OrderByDescending(x => x.ModifiedDate).ToList();
             }
             return estimations;
         }
@@ -82,6 +83,22 @@ namespace Core.Services
             StoreEstimationResultToDb(estimation, estimationPath, previewPath, fileName);
             File.Delete($"{fileLocation}.mp4");
             return estimation;
+        }
+
+        public Stream? GetEstimationAttachment(string estimationid, AttachmentType attachmentType)
+        {
+            using (var session = _store.OpenSession())
+            {
+                var estimation = session.Query<Estimation>().Where(x => x.InternalGuid == estimationid).FirstOrDefault();
+                if(estimation == null)
+                {
+                    throw new Exception("Estimation could not be found");
+                }
+
+                var attachmentName = attachmentType == AttachmentType.Joints ? Constants.JOINTS_FILENAME : Constants.PREVIEW_FILENAME;
+                var result = session.Advanced.Attachments.Get(estimation, attachmentName);
+                return result.Stream;
+            }
         }
 
         //todo make this async?
@@ -156,8 +173,8 @@ namespace Core.Services
             {
                 estimation.State = EstimationState.Success;
                 session.Store(estimation, guid);
-                session.Advanced.Attachments.Store(guid, $"{file_name}.npz", estimationFile);
-                session.Advanced.Attachments.Store(guid, $"{file_name}_result.mp4", previewFile);
+                session.Advanced.Attachments.Store(guid, Constants.JOINTS_FILENAME, estimationFile);
+                session.Advanced.Attachments.Store(guid, Constants.PREVIEW_FILENAME, previewFile);
                 session.SaveChanges();
             }
         }
