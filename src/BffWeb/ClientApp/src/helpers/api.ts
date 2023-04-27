@@ -27,11 +27,6 @@ const fetchWithDefaults = async (endpointName: string, method: string, params:Re
     return unparsed.json() as IProblemDetails;
 }
 
-
-export const getCurrentUserProfile = (id: string) => {
-    return fetchWithDefaults('UserProfile', Methods.Get, [{"guid" : id}]);
-}
-
 export const isReturnData = (data: any) => {
     return data['traceId'] === undefined
 }

@@ -1,9 +1,8 @@
 import axios from 'axios';
 import { useQuery } from 'react-query';
-import { IEstimation } from './api.types';
 
 const idKeys = {
-  idk: ['props']
+  idk: ['verifiedIdentity']
 }
 
 const config = {
@@ -13,7 +12,7 @@ const config = {
 }
 
 const fetchData = async () =>
-  axios.get('/bff/Identity/GetIdToken', config)
+  axios.get('/api/Identity/GetIdToken', config)
     .then((res) => res.data);
 
 
