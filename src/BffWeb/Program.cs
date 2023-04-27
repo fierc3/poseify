@@ -1,4 +1,3 @@
-using BffWeb.Controllers;
 using Duende.Bff.Yarp;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -74,6 +73,9 @@ app.MapRemoteBffApiEndpoint("/api/GetUserEstimations", "https://localhost:" + re
           .RequireAccessToken(Duende.Bff.TokenType.User);
 
 app.MapRemoteBffApiEndpoint("/api/GetAttachment", "https://localhost:" + remoteApiPort + "/api/Attachment/GetAttachment")
+          .RequireAccessToken(Duende.Bff.TokenType.User);
+          
+app.MapRemoteBffApiEndpoint("/api/Identity/GetIdToken", "https://localhost:" + remoteApiPort + "/api/Identity/GetIdToken")
           .RequireAccessToken(Duende.Bff.TokenType.User);
 
 app.Run();

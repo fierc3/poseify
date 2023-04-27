@@ -12,7 +12,7 @@ namespace Backend.Controllers
     {
         [ActionName("GetIdToken")]
         [HttpGet(Name = "GetIdToken")]
-        public async Task<IActionResult> GetIdToken()
+        public IActionResult GetIdToken()
         {
             // hint: "sub" claim name to "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
             var name = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

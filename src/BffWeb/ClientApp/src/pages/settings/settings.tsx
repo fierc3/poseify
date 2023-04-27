@@ -1,6 +1,7 @@
 import { FC } from "react";
 import useClaims from "../../helpers/claims";
 import { Box, Typography } from "@mui/material";
+import useAuthentication from "../../helpers/identity";
 
 const Settings: FC = () => {
     const {data: claims} = useClaims();
