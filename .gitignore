@@ -37,3 +37,4 @@ src/Core/PoseEstimation/log.txt
 src/Core/appsettings.Development.json
 src/Core/appsettings.Development.json
 src/Core/PoseEstimation/checkpoint
+src/Core/PoseEstimation/vp3d/
