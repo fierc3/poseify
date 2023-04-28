@@ -1,53 +1,53 @@
 using Duende.Bff.Yarp;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllers();
 builder.Services.AddBff()
     .AddRemoteApis();
 
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = "cookie";
+    options.DefaultScheme = "Cookies";
     options.DefaultChallengeScheme = "oidc";
     options.DefaultSignOutScheme = "oidc";
 })
-.AddCookie("cookie", options =>
+.AddCookie("Cookies", options =>
 {
     options.Cookie.Name = "__Host-bff";
     options.Cookie.SameSite = SameSiteMode.Strict;
 })
 .AddOpenIdConnect("oidc", options =>
 {
-    options.Authority = "https://demo.duendesoftware.com";
-    options.ClientId = "interactive.confidential";
+    options.Authority = "https://localhost:5001/";
+    options.ClientId = "PoseifyBff";
     options.ClientSecret = "secret";
     options.ResponseType = "code";
     options.ResponseMode = "query";
 
-    options.GetClaimsFromUserInfoEndpoint = true;
-    options.MapInboundClaims = false;
-    options.SaveTokens = true;
-
     options.Scope.Clear();
     options.Scope.Add("openid");
     options.Scope.Add("profile");
-    options.Scope.Add("api");
-    options.Scope.Add("offline_access");
+    options.Scope.Add("poseifyApiScope");
+    options.GetClaimsFromUserInfoEndpoint = true;
+    options.MapInboundClaims = true;
+    options.SaveTokens = true;
 
     options.TokenValidationParameters = new()
     {
-        NameClaimType = "name",
-        RoleClaimType = "role"
+        NameClaimType = ClaimTypes.NameIdentifier,
     };
 });
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
@@ -67,12 +67,16 @@ app.MapBffManagementEndpoints();
 
 int remoteApiPort = 7236;
 app.MapRemoteBffApiEndpoint("/api/GetEstimationTest", "https://localhost:" + remoteApiPort + "/api/Estimation/GetEstimationTest")
-          .RequireAccessToken();
+          .RequireAccessToken(Duende.Bff.TokenType.User);
 
 app.MapRemoteBffApiEndpoint("/api/GetUserEstimations", "https://localhost:" + remoteApiPort + "/api/Estimation/GetUserEstimations")
-          .RequireAccessToken();
+          .RequireAccessToken(Duende.Bff.TokenType.User);
 
 app.MapRemoteBffApiEndpoint("/api/GetAttachment", "https://localhost:" + remoteApiPort + "/api/Attachment/GetAttachment")
-          .RequireAccessToken();
+          .RequireAccessToken(Duende.Bff.TokenType.User);
+          
+app.MapRemoteBffApiEndpoint("/api/Identity/GetIdToken", "https://localhost:" + remoteApiPort + "/api/Identity/GetIdToken")
+          .RequireAccessToken(Duende.Bff.TokenType.User);
 
 app.Run();
+
