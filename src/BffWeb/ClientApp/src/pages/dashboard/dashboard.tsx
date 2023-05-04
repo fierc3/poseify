@@ -2,6 +2,7 @@ import { EstimationList } from "../../components/estimation-list/estimation-list
 import { Box, LinearProgress, Paper, Stack, Typography } from "@mui/material";
 import useClaims from "../../helpers/claims";
 import { useCallback } from "react";
+import { UploadButton } from "../../components/upload-button/upload-button";
 
 const Dashboard = () => {
 
@@ -15,13 +16,15 @@ const Dashboard = () => {
     return ''
   }, [data])
 
+
   return (
     <Stack sx={{ height: "90vh" }} direction="column" gap={4} flexWrap="nowrap">
       <Stack maxWidth="xl" width={"100%"} marginTop={2} alignSelf={"center"} flexGrow={1} spacing={{ xs: 1, sm: 2 }} direction="row" useFlexGap flexWrap="wrap">
         <Box flexGrow={7} sx={{}}>
-          <Typography variant="h5" textAlign={"start"} paddingLeft={3}>
+          <Typography variant="h5" textAlign={"start"} paddingLeft={3} paddingBottom={"5%"}>
             Welcome Back{getDisplayName()}
           </Typography>
+          <UploadButton/>
         </Box>
         <Paper sx={{ display: { xs: 'none', sm: 'block' } }} style={{ backgroundColor: "black", flexGrow: 3, alignContent: "center" }}>
           <Stack flexGrow={1} spacing={{ xs: 3, sm: 4 }} direction="column" useFlexGap flexWrap="wrap" paddingTop={2}>
@@ -45,7 +48,7 @@ const Dashboard = () => {
           </Stack>
         </Paper>
       </Stack>
-      <Box height="xl" maxWidth="xl" width={"100%"} alignSelf={"center"} flexGrow={2} sx={{ width: "100vw" }}>
+      <Box maxHeight={"70%"} maxWidth="xl" width={"100%"} alignSelf={"center"} flexGrow={2} sx={{ width: "100vw" }}>
         <EstimationList />
       </Box>
     </Stack>
