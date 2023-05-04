@@ -71,7 +71,6 @@ export const EstimationList: FC = () => {
               }
             })}
             variant="contained"
-            disabled={params.row.state === EstimationState.Processing}
           >
             Delete
           </Button>
