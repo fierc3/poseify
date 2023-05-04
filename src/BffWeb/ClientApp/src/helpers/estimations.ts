@@ -22,9 +22,9 @@ function useEstimations() {
     claimsKeys.claim,
     async () => fetchData(),
     {
-      staleTime: Infinity,
-      cacheTime: Infinity,
-      retry: false
+      staleTime: 20000, // 20 seconds
+      cacheTime: 60000, // 1 minute
+      retry: true
     }
   )
 }
