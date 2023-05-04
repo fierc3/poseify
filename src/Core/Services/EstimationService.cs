@@ -1,6 +1,7 @@
 ﻿using Core.Models;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Attachments;
+using Raven.Client.Documents.Operations.OngoingTasks;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -12,6 +13,8 @@ namespace Core.Services
         private readonly ILogger<EstimationService> _logger;
         private readonly IDocumentStore _store;
         private readonly IConfiguration _configuration;
+
+        public static Dictionary<string, Process> RunningProcesses = new Dictionary<string, Process>();
 
         public EstimationService(ILogger<EstimationService> logger, IConfiguration configuration)
         {
@@ -29,7 +32,7 @@ namespace Core.Services
             return estimations;
         }
         
-        public Estimation? RegisterEstimation(string displayName, IEnumerable<Tag>? tags, string userGuid) {
+        public Estimation? RegisterEstimation(string displayName, IEnumerable<string> tags, string userGuid) {
             string guid = Guid.NewGuid().ToString();
             Estimation? estimation = null;
 
@@ -39,7 +42,7 @@ namespace Core.Services
                 {
                     InternalGuid = guid,
                     DisplayName = displayName,
-                    Tags = tags?.Select(x => x.InternalGuid).ToList(),
+                    Tags = tags,
                     UploadingProfile = userGuid,
                     ModifiedDate = DateTime.Now,
                     State = EstimationState.Processing
@@ -58,8 +61,11 @@ namespace Core.Services
             session.SaveChanges();
         }
     
-        public Estimation HandleUploadedFile(string userGuid, string directory, string fileName, string fileExtension, string displayName, IEnumerable<Tag>? tags)
+        public Estimation HandleUploadedFile(string userGuid, string directory, string fileName, string fileExtension, string displayName, IEnumerable<string> tags)
         {
+            // ensure file extension is without dot
+            fileExtension = fileExtension.Replace(".", "");
+
             var estimation = RegisterEstimation(displayName, tags, userGuid);
             if(estimation == null)
             {

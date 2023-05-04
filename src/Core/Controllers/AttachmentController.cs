@@ -18,14 +18,14 @@ namespace Backend.Controllers
             _estimationService = estimationHandler;
             _configuration = configuration;
         }
-        
+
         [ActionName("GetAttachment")]
         [HttpGet(Name = "GetAttachment")]
         public async Task<IActionResult> Get(string estimationId, AttachmentType attachmentType)
         {
             var attachmentFile = _estimationService.GetEstimationAttachment(estimationId, attachmentType);
 
-            if(attachmentFile == null)
+            if (attachmentFile == null)
             {
                 return Problem("Couldn't load attachment");
             }
@@ -35,3 +35,4 @@ namespace Backend.Controllers
         }
     }
 }
+

@@ -78,5 +78,8 @@ app.MapRemoteBffApiEndpoint("/api/GetAttachment", "https://localhost:" + remoteA
 app.MapRemoteBffApiEndpoint("/api/Identity/GetIdToken", "https://localhost:" + remoteApiPort + "/api/Identity/GetIdToken")
           .RequireAccessToken(Duende.Bff.TokenType.User);
 
+app.MapRemoteBffApiEndpoint("/api/PostUpload", "https://localhost:" + remoteApiPort + "/api/Upload/PostUpload")
+          .RequireAccessToken();
+
 app.Run();
 
