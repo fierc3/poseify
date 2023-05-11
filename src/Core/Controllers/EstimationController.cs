@@ -58,6 +58,21 @@ namespace Backend.Controllers
             }
         }
 
+        [ActionName("DeleteEstimation")]
+        [HttpDelete(Name = "DeleteEstimation")]
+        public ActionResult<bool> DeleteEstimation(string estimationId)
+        {
+            try
+            {
+                _estimationHandler.DeleteEstimation(estimationId);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return Problem($"A problem occured when trying to delete estimation:{ex}");
+            }
+        }
+
         // ---- only for testing purposes ----
 
         [ActionName("GetEstimationTest")]

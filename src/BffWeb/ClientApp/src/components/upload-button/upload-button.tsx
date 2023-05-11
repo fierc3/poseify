@@ -2,9 +2,11 @@ import { BaseSyntheticEvent, FC, useState } from "react";
 import { Alert, Backdrop, Button, Checkbox, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Fab, ListItemText, MenuItem, Select, SelectChangeEvent, Snackbar, Stack, TextField, Typography } from "@mui/material";
 import axios from "axios";
 import NavigationIcon from '@mui/icons-material/Navigation';
+import useEstimations from "../../helpers/estimations";
 
 export const UploadButton: FC = () => {
 
+    const { refetch } = useEstimations();
     const [openUpoadDialog, setOpenUploadDialog] = useState(false);
 
     const handleClickOpen = () => {
@@ -81,6 +83,7 @@ export const UploadButton: FC = () => {
 
         //setValue("thumbnail", res.data.url);
         setTimeout(() => setIsUploading(false), 200);
+        refetch();
     };
 
     return (

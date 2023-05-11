@@ -8,9 +8,10 @@ import SuccessIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import { Button } from "@mui/material";
 import { EstimationView } from "../estimation-view/estimation-view";
+import axios from "axios";
 
 export const EstimationList: FC = () => {
-  const { data: rawEstimations, isFetched } = useEstimations();
+  const { data: rawEstimations, isFetched, refetch } = useEstimations();
   const [estimations, setEstimations] = useState<IEstimation[]>([]);
   const [isDataLoaded, setDataLoad] = useState<boolean>(false);
   const [selectedEstimation, setSelectedEstimation] = useState<IEstimation | null>(null);
@@ -64,9 +65,12 @@ export const EstimationList: FC = () => {
           </Button>
           <Button
             sx={{ marginLeft: 1 }}
-            onClick={(e) => console.log("tbi")}
+            onClick={(e) => axios.delete(`/api/DeleteEstimation?estimationId=${params.row.internalGuid}`, { headers: { 'X-CSRF': '1' } }).then(res =>{
+              if(res.status === 200){
+                refetch();
+              }
+            })}
             variant="contained"
-            disabled={params.row.state === EstimationState.Processing}
           >
             Delete
           </Button>

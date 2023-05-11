@@ -1,10 +1,6 @@
 ﻿using Core.Models;
 using Raven.Client.Documents;
-using Raven.Client.Documents.Attachments;
-using Raven.Client.Documents.Operations.OngoingTasks;
-using System;
 using System.Diagnostics;
-using System.IO;
 
 namespace Core.Services
 {
@@ -38,7 +34,7 @@ namespace Core.Services
 
             using (var session = _store.OpenSession())
             {
-                estimation = new()
+                estimation = new Estimation()
                 {
                     InternalGuid = guid,
                     DisplayName = displayName,
@@ -73,7 +69,7 @@ namespace Core.Services
             }
             try
             {
-                RunEstimation(userGuid, directory, fileName, fileExtension);
+                RunEstimation(userGuid, directory, fileName, fileExtension, estimation.InternalGuid);
             }
             catch
             {
@@ -107,8 +103,32 @@ namespace Core.Services
             }
         }
 
+        public void DeleteEstimation(string estimationid)
+        {
+            using (var session = _store.OpenSession())
+            {
+                var estimation = session.Query<Estimation>().Where(x => x.InternalGuid == estimationid).FirstOrDefault();
+                if (estimation == null)
+                {
+                    throw new Exception("Estimation could not be found");
+                }
+
+                var processes = RunningProcesses.Where(x => x.Key.Equals(estimationid)).ToList();
+
+                if(processes.Any())
+                {
+                    foreach(var process in processes) {
+                        if (process.Value != null) process.Value.Kill(true);
+                    }
+                }
+
+                session.Delete(estimation);
+                session.SaveChanges();
+            }
+        }
+
         //todo make this async?
-        private void RunEstimation(string userGuid, string directory, string fileName, string fileExtension)
+        private void RunEstimation(string userGuid, string directory, string fileName, string fileExtension, string estimationGuid)
         {
             int totalFrames = 0;
             string? estimationScriptLocation = _configuration["EstimationScriptLocation"];
@@ -154,7 +174,9 @@ namespace Core.Services
             estimationProcess.Start();
             estimationProcess.BeginOutputReadLine();
             estimationProcess.BeginErrorReadLine();
+            RunningProcesses.Add(estimationGuid, estimationProcess);
             estimationProcess.WaitForExit();
+            RunningProcesses.Remove(estimationGuid);
 
             if (exception != null)
             {
