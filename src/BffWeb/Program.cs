@@ -24,7 +24,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddOpenIdConnect("oidc", options =>
 {
-    options.Authority = "https://localhost:5001/";
+    options.Authority = "https://localhost:8001/";
     options.ClientId = "PoseifyBff";
     options.ClientSecret = "secret";
     options.ResponseType = "code";
