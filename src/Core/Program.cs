@@ -23,7 +23,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = "https://localhost:5001";
+        options.Authority = "https://localhost:8001";
         //options.Audience = "https://localhost:44462";
         options.TokenValidationParameters.ValidateAudience = false;
     });
