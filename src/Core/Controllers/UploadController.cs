@@ -1,5 +1,6 @@
 using Core.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Backend.Controllers
 {
@@ -32,10 +33,17 @@ namespace Backend.Controllers
                 return Problem("Missing Upload File");
             }
 
+            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if(username == null)
+            {
+                return Problem("Missing username, probably not logged in");
+            }
+
             var file = uploadModel.FormFile;
 
             string? directory = _configuration["UploadDirectory"];
-            string userGuid = "DEEZNUZ";
+            string userGuid = username;
             string uniqueFilename = Guid.NewGuid().ToString();
             string fileExtension = System.IO.Path.GetExtension(file.FileName);
 
@@ -58,6 +66,9 @@ namespace Backend.Controllers
 
             if (file.Length > 0)
             {
+
+                System.IO.Directory.CreateDirectory($"{directory}\\{userGuid}");
+
                 string fileLocation = $"{directory}\\{userGuid}\\{uniqueFilename}{fileExtension}";
 
                 using (var stream = System.IO.File.Create(fileLocation))

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Backend.Controllers
 {
@@ -23,7 +24,15 @@ namespace Backend.Controllers
         [HttpGet(Name = "GetAttachment")]
         public async Task<IActionResult> Get(string estimationId, AttachmentType attachmentType)
         {
-            var attachmentFile = _estimationService.GetEstimationAttachment(estimationId, attachmentType);
+
+            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (username == null)
+            {
+                return Problem("Missing username, probably not logged in");
+            }
+
+            var attachmentFile = _estimationService.GetEstimationAttachment(estimationId, attachmentType, username);
 
             if (attachmentFile == null)
             {

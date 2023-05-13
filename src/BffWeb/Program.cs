@@ -66,8 +66,6 @@ app.MapBffManagementEndpoints();
 
 
 int remoteApiPort = 7236;
-app.MapRemoteBffApiEndpoint("/api/GetEstimationTest", "https://localhost:" + remoteApiPort + "/api/Estimation/GetEstimationTest")
-          .RequireAccessToken(Duende.Bff.TokenType.User);
 
 app.MapRemoteBffApiEndpoint("/api/GetUserEstimations", "https://localhost:" + remoteApiPort + "/api/Estimation/GetUserEstimations")
           .RequireAccessToken(Duende.Bff.TokenType.User);
@@ -75,9 +73,6 @@ app.MapRemoteBffApiEndpoint("/api/GetUserEstimations", "https://localhost:" + re
 app.MapRemoteBffApiEndpoint("/api/GetAttachment", "https://localhost:" + remoteApiPort + "/api/Attachment/GetAttachment")
           .RequireAccessToken(Duende.Bff.TokenType.User);
           
-app.MapRemoteBffApiEndpoint("/api/Identity/GetIdToken", "https://localhost:" + remoteApiPort + "/api/Identity/GetIdToken")
-          .RequireAccessToken(Duende.Bff.TokenType.User);
-
 app.MapRemoteBffApiEndpoint("/api/PostUpload", "https://localhost:" + remoteApiPort + "/api/Upload/PostUpload")
           .RequireAccessToken();
 

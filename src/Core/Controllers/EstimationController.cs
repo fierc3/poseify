@@ -1,5 +1,6 @@
 using Core.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Backend.Controllers
 {
@@ -20,37 +21,22 @@ namespace Backend.Controllers
             _configuration = configuration;
         }
         
-        [ActionName("GetEstimation")]
-        [HttpGet(Name = "GetEstimation")]
-        public ActionResult<Estimation> Get(string userGuid, string fileName, string fileExtension, string displayName, IEnumerable<string>? tags)
-        {
-            string? directory = _configuration["UploadDirectory"];
-
-            if (directory == null)
-            {
-                return Problem("Upload Directory is not defined");
-            }
-
-            Estimation? estimation;
-            try
-            {
-                estimation = _estimationHandler.HandleUploadedFile(userGuid, directory, fileName, fileExtension, displayName, null);
-            }
-            catch (Exception ex)
-            {
-                return Problem($"A problem occured when trying to convert input with VideoPose3D\nDetail:{ex}");
-            }
-            return estimation;
-        }
 
         [ActionName("GetUserEstimations")]
         [HttpGet(Name = "GetUserEstimations")]
         public ActionResult<IEnumerable<Estimation>?> Get()
         {
+            
+            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (username == null)
+            {
+                return Problem("Missing username, probably not logged in");
+            }
+
             try
             {
-                //todo use userid from token
-                return _estimationHandler.GetAllUserEstimations("DEEZNUZ").ToList();
+                return _estimationHandler.GetAllUserEstimations(username).ToList();
             }
             catch (Exception ex)
             {
@@ -62,44 +48,22 @@ namespace Backend.Controllers
         [HttpDelete(Name = "DeleteEstimation")]
         public ActionResult<bool> DeleteEstimation(string estimationId)
         {
+            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (username == null)
+            {
+                return Problem("Missing username, probably not logged in");
+            }
+
             try
             {
-                _estimationHandler.DeleteEstimation(estimationId);
+                _estimationHandler.DeleteEstimation(estimationId, username);
                 return true;
             }
             catch (Exception ex)
             {
                 return Problem($"A problem occured when trying to delete estimation:{ex}");
             }
-        }
-
-        // ---- only for testing purposes ----
-
-        [ActionName("GetEstimationTest")]
-        [HttpGet(Name = "GetEstimationTest")]
-        public ActionResult<Estimation> GetTest()
-        {
-            // assuming this can only happen if user exists in db, so user_id isnt being checked
-            string userGuid = "DEEZNUZ";
-            string fileName = "test_man";
-            string fileExtension = "mp4";
-            string displayName = "test1";
-            string? directory = _configuration["UploadDirectory"];
-
-            if (directory == null) {
-                return Problem("Configuration issue, missing UploadDirectory");
-            }
-
-            Estimation? estimation;
-            try
-            {
-                estimation = _estimationHandler.HandleUploadedFile(userGuid, directory, fileName, fileExtension, displayName, null);
-            }
-            catch (Exception ex)
-            {
-                return Problem($"A problem occured when trying to convert input with VideoPose3D\nDetail:{ex}");
-            }
-            return estimation;
         }
     }
 }
