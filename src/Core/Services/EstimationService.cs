@@ -86,11 +86,11 @@ namespace Core.Services
             return estimation;
         }
 
-        public Stream? GetEstimationAttachment(string estimationid, AttachmentType attachmentType)
+        public Stream? GetEstimationAttachment(string estimationid, AttachmentType attachmentType, string userGuid)
         {
             using (var session = _store.OpenSession())
             {
-                var estimation = session.Query<Estimation>().Where(x => x.InternalGuid == estimationid).FirstOrDefault();
+                var estimation = session.Query<Estimation>().Where(x => x.InternalGuid == estimationid && x.UploadingProfile == userGuid).FirstOrDefault();
                 if(estimation == null)
                 {
                     throw new Exception("Estimation could not be found");
@@ -102,11 +102,11 @@ namespace Core.Services
             }
         }
 
-        public void DeleteEstimation(string estimationid)
+        public void DeleteEstimation(string estimationid, string userGuid)
         {
             using (var session = _store.OpenSession())
             {
-                var estimation = session.Query<Estimation>().Where(x => x.InternalGuid == estimationid).FirstOrDefault();
+                var estimation = session.Query<Estimation>().Where(x => x.InternalGuid == estimationid && x.UploadingProfile == userGuid).FirstOrDefault();
                 if (estimation == null)
                 {
                     throw new Exception("Estimation could not be found");
