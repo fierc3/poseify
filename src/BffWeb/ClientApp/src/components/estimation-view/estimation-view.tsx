@@ -48,7 +48,7 @@ export const EstimationView: FC<{ estimation: IEstimation | null, open: boolean,
                         Estimation: {props.estimation.displayName}
                     </DialogTitle>
                     <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
+                        <DialogContentText id="alert-dialog-description" textAlign={"center"}>
                             {previewUrl ?(<video autoPlay width={500} loop>
                                 <source src={previewUrl} type="video/mp4" />
                             </video>) : <CircularProgress/>}
