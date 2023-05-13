@@ -45,7 +45,6 @@ namespace Core.Services
                 };
                 session.Store(estimation, guid);
                 session.SaveChanges();
-                estimation = session.Query<Estimation>().Where(x => x.InternalGuid == guid).FirstOrDefault();
             }
             return estimation;
         }
