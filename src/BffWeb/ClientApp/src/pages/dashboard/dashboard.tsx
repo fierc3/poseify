@@ -9,7 +9,7 @@ const Dashboard = () => {
   const { data } = useClaims()
 
   const getDisplayName = useCallback(() => {
-    var displayName = (data as { type: string; value: string }[])?.filter(x => x.type === "given_name")[0]?.value
+    var displayName = (data as { type: string; value: string }[])?.filter(x => x.type === "name")[0]?.value
     if (displayName) {
       return ', ' + displayName;
     }
