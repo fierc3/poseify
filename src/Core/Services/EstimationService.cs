@@ -124,7 +124,7 @@ namespace Core.Services
                     throw new Exception("Estimation could not be found");
                 }
 
-                var attachmentName = attachmentType == AttachmentType.Joints ? Constants.JOINTS_FILENAME : Constants.PREVIEW_FILENAME;
+                var attachmentName = attachmentType == AttachmentType.Joints ? Constants.JOINTS_FILENAME : attachmentType == AttachmentType.Preview ? Constants.PREVIEW_FILENAME : Constants.NPZ_FILENAME;
                 var result = session.Advanced.Attachments.Get(estimation, attachmentName);
                 return result.Stream;
             }
