@@ -181,7 +181,7 @@ namespace Core.Services
                 {
                     if (totalFrames == 0 && ev.Data.Contains("Total Frames:"))
                     {
-                        totalFrames = int.Parse(ev.Data.Split(':').Last());
+                        totalFrames = int.TryParse(ev.Data.Split(':').Last(), out totalFrames) ? totalFrames : 666;
                     }
                     if (ev.Data.Contains("Frame") && ev.Data.Contains("processed") || ev.Data.Contains($"/{totalFrames}")) // before or is infer2d after or is run.py
                     {
