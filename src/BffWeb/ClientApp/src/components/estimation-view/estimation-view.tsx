@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from "react";
-import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { IconButton, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import { AttachmentType, IEstimation } from "../../helpers/api.types";
+import { Download } from '@mui/icons-material';
 import axios from "axios";
 
 export const EstimationView: FC<{ estimation: IEstimation | null, open: boolean, handleClose: () => void }> = (props) => {
@@ -27,7 +28,7 @@ export const EstimationView: FC<{ estimation: IEstimation | null, open: boolean,
                 const url = window.URL.createObjectURL(new Blob([res.data]));
                 const link = document.createElement('a');
                 link.href = url;
-                var fileName = type === AttachmentType.Joints ? estimation.displayName + '.npz' : estimation.displayName + '.mp4'
+                var fileName = type === AttachmentType.Joints ? estimation.displayName + '.json' : type === AttachmentType.Preview ? estimation.displayName + '.mp4' : estimation.displayName + '.npz'
                 link.setAttribute('download', fileName); //or any other extension
                 document.body.appendChild(link);
                 link.click();
@@ -54,16 +55,22 @@ export const EstimationView: FC<{ estimation: IEstimation | null, open: boolean,
                             </video>) : <CircularProgress/>}
                         </DialogContentText>
                     </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => download(props.estimation, AttachmentType.Joints)} autoFocus>
-                            Download Joint Positions
-                        </Button>
-                        <Button onClick={() => download(props.estimation, AttachmentType.Preview)} autoFocus>
-                            Download Preview
-                        </Button>
-                        <Button onClick={props.handleClose} autoFocus>
+                    <DialogActions style={{ justifyContent: "space-between" }}>
+                        <IconButton size="small" onClick={() => download(props.estimation, AttachmentType.Joints)} autoFocus>
+                            <Download fontSize="small"/>
+                            Joints
+                        </IconButton>
+                        <IconButton size="small" onClick={() => download(props.estimation, AttachmentType.Npz)} autoFocus>
+                        <Download fontSize="small"/>
+                            NPZ
+                        </IconButton>
+                        <IconButton size="small" onClick={() => download(props.estimation, AttachmentType.Preview)} autoFocus>
+                        <Download fontSize="small"/>
+                            Preview
+                        </IconButton>
+                        <IconButton size="small" onClick={props.handleClose} autoFocus>
                             close
-                        </Button>
+                        </IconButton>
                     </DialogActions>
                 </Dialog>
             )}

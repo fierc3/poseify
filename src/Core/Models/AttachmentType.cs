@@ -4,5 +4,6 @@ using System.Text.Json.Serialization;
 public enum AttachmentType
 {
     Preview,
-    Joints
+    Joints,
+    Npz
 }

@@ -100,10 +100,17 @@ namespace Core.Services
 
             string fileLocation = $"{directory}\\{userGuid}\\{fileName}";
             string estimationPath = $"{fileLocation}.{fileExtension}.npz";
+            string npyPath = $"{fileLocation}_result.npy";
+            string inputPath = $"{fileLocation}.{fileExtension}";
             string previewPath = $"{fileLocation}_result.mp4";
+            string jointPath = $"{fileLocation}_result.json";
 
-            StoreEstimationResultToDb(estimation, estimationPath, previewPath, fileName);
-            File.Delete($"{fileLocation}.mp4");
+            StoreEstimationResultToDb(estimation, estimationPath, jointPath, previewPath, fileName);
+            File.Delete($"{jointPath}");
+            File.Delete($"{previewPath}");
+            File.Delete($"{estimationPath}");
+            File.Delete($"{npyPath}");
+            File.Delete($"{inputPath}");
             return estimation;
         }
 
@@ -207,7 +214,7 @@ namespace Core.Services
         }
 
         //create a new estimation entry and attach a file to it
-        private void StoreEstimationResultToDb(Estimation estimation, string estimationPath, string previewPath, string file_name)
+        private void StoreEstimationResultToDb(Estimation estimation, string estimationPath, string jointPath, string previewPath, string file_name)
         {
             if(estimation == null)
             {
@@ -217,12 +224,15 @@ namespace Core.Services
             string guid = estimation.InternalGuid;
             using (var session = _store.OpenSession())
             using (var estimationFile = File.Open(estimationPath, FileMode.Open))
+            using (var jointFile = File.Open(jointPath, FileMode.Open))
             using (var previewFile = File.Open(previewPath, FileMode.Open))
             {
                 estimation.State = EstimationState.Success;
+                estimation.StateText = "Successfull estimation";
                 session.Store(estimation, guid);
-                session.Advanced.Attachments.Store(guid, Constants.JOINTS_FILENAME, estimationFile);
+                session.Advanced.Attachments.Store(guid, Constants.NPZ_FILENAME, estimationFile);
                 session.Advanced.Attachments.Store(guid, Constants.PREVIEW_FILENAME, previewFile);
+                session.Advanced.Attachments.Store(guid, Constants.JOINTS_FILENAME, jointFile);
                 session.SaveChanges();
             }
         }

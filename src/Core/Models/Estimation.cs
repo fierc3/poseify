@@ -11,6 +11,7 @@ namespace Core.Models
         public IEnumerable<string>? Tags { get; set; } = new List<string>();
         public string UploadingProfile { get; set; } = "";
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
-        public EstimationState State { get; set; } 
+        public EstimationState State { get; set; }
+        public string StateText { get; set; } = string.Empty;
     }
 }
