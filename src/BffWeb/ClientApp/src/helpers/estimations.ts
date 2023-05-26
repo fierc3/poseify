@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useQuery } from 'react-query';
 import { IEstimation } from './api.types';
+import useClaims from './claims';
 
 const claimsKeys = {
   claim: ['estimations']
@@ -12,9 +13,12 @@ const config = {
   }
 }
 
+
+
 const fetchData = async () =>
   axios.get('/api/GetUserEstimations', config)
-    .then((res) => res.data as  IEstimation[]);
+  .then((res) => res.data as IEstimation[]);
+
 
 
 function useEstimations() {
@@ -22,9 +26,9 @@ function useEstimations() {
     claimsKeys.claim,
     async () => fetchData(),
     {
-      staleTime: 20000, // 20 seconds
-      cacheTime: 60000, // 1 minute
-      retry: true
+      staleTime: Infinity,
+      cacheTime: Infinity,
+      refetchInterval: 1000 * 15,
     }
   )
 }
