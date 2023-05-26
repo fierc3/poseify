@@ -62,10 +62,30 @@ namespace Core.Services
             fileExtension = fileExtension.Replace(".", "");
 
             var estimation = RegisterEstimation(displayName, tags, userGuid);
-            if(estimation == null)
+
+            if (estimation == null)
             {
                 throw new Exception("Estimation could not be registered");
             }
+
+            using (var session = _store.OpenSession())
+            {
+                var needsToBeQueued = session.Query<Estimation>().Where(x => x.State == EstimationState.Processing).Count() > Constants.MAXPROCESSING;
+                if (needsToBeQueued)
+                {
+                    estimation.State = EstimationState.Queued;
+                    estimation.StateText = "Currently queued, processing continues when gpu is available";
+                    UpdateEstimation(estimation);
+                    _ = QueueService.AddToQueueAsync(estimation, this, _store, userGuid, directory, fileName, fileExtension);
+                    return estimation;
+                }
+            }
+
+            return RunFile(userGuid, directory, fileName, fileExtension, estimation);
+        }
+
+        public Estimation RunFile(string userGuid, string directory, string fileName, string fileExtension, Estimation? estimation)
+        {
             try
             {
                 RunEstimation(userGuid, directory, fileName, fileExtension, estimation.InternalGuid);
@@ -73,6 +93,7 @@ namespace Core.Services
             catch
             {
                 estimation.State = EstimationState.Failed;
+                estimation.StateText = "Error during run of estimation";
                 UpdateEstimation(estimation);
                 throw;
             }

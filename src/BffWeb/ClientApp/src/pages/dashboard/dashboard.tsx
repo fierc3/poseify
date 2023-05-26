@@ -1,20 +1,28 @@
 import { EstimationList } from "../../components/estimation-list/estimation-list";
 import { Box, LinearProgress, Paper, Stack, Typography } from "@mui/material";
 import useClaims from "../../helpers/claims";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { UploadButton } from "../../components/upload-button/upload-button";
+import useEstimations from "../../helpers/estimations";
+import { EstimationState } from "../../helpers/api.types";
 
 const Dashboard = () => {
 
-  const { data } = useClaims()
+  const { data: claimsData } = useClaims()
+  const { data: rawEstimations, isFetched } = useEstimations();
 
   const getDisplayName = useCallback(() => {
-    var displayName = (data as { type: string; value: string }[])?.filter(x => x.type === "name")[0]?.value
+    var displayName = (claimsData as { type: string; value: string }[])?.filter(x => x.type === "name")[0]?.value
     if (displayName) {
       return ', ' + displayName;
     }
     return ''
-  }, [data])
+  }, [claimsData])
+
+
+  const maxQueue = 1;
+
+  const queuedEstimations: number = useMemo(() => rawEstimations?.filter(x => x.state === EstimationState.Processing || x.state === EstimationState.Queued).length ?? 0, [rawEstimations])
 
 
   return (
@@ -24,25 +32,35 @@ const Dashboard = () => {
           <Typography variant="h5" textAlign={"start"} paddingLeft={3} paddingBottom={"5%"}>
             Welcome Back{getDisplayName()}
           </Typography>
-          <UploadButton/>
+          <UploadButton blocked={queuedEstimations >= maxQueue}/>
         </Box>
         <Paper sx={{ display: { xs: 'none', sm: 'block' } }} style={{ backgroundColor: "black", flexGrow: 3, alignContent: "center" }}>
           <Stack flexGrow={1} spacing={{ xs: 3, sm: 4 }} direction="column" useFlexGap flexWrap="wrap" paddingTop={2}>
             <Box>
               <Typography color={"white"} variant="subtitle1">
-                Daily Limit
+                My Queued Estimations
               </Typography>
-              <LinearProgress color="secondary" variant="determinate" value={20} sx={{ width: "50%", marginLeft: "25%" }} />
+              <LinearProgress color="secondary" variant="determinate" value={queuedEstimations === maxQueue ? 100 : maxQueue/100 * queuedEstimations} sx={{ width: "50%", marginLeft: "25%" }} />
               <Typography color={"white"} alignContent={"center"} variant="subtitle2">
-                Used x out of y
+              {isFetched ? (<>{queuedEstimations} out of 1
+               </>): (<>Checking queued estimations</>)}
               </Typography>
+             
             </Box>
             <Box>
               <Typography color={"white"} alignContent={"center"} variant="h5" >
-                Need more Uploads?
+                Thank you for testing Poseify Beta!
               </Typography>
               <Typography color={"white"} alignContent={"center"} variant="subtitle1" >
-                <a href="https://google.com">Contact</a> us to request more uploads
+                <a href="https://forms.gle/29S7T5Vcz3W9kbJKA">Feedback</a> is appreciated.
+              </Typography>
+              <Typography color={"white"} alignContent={"center"} variant="subtitle2" >
+                Estimated times for processing: <br/>
+                - 50mb = 10min <br/>
+                - 20mb = 2min
+              </Typography>
+              <Typography color={"yellow"} alignContent={"center"} variant="subtitle2" >
+                Reported Issues: IF GRID LOADS FOREVER PLEASE RELOGIN
               </Typography>
             </Box>
           </Stack>

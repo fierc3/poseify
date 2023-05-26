@@ -26,7 +26,8 @@ export interface IProblemDetails {
 export enum EstimationState{
     Success = "Success",
     Processing ="Processing",
-    Failed = "Failed"
+    Failed = "Failed",
+    Queued ="Queued",
 }
 
 export interface IEstimation {

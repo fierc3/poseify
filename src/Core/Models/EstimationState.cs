@@ -5,5 +5,6 @@ public enum EstimationState
 {
     Processing,
     Failed,
-    Success
+    Success,
+    Queued
 }
