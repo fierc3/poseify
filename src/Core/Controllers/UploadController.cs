@@ -57,11 +57,11 @@ namespace Backend.Controllers
                 return Problem("File has zero size");
             }
 
-            var maxSizeInMb = 10;
+            var maxSizeInMb = 50;
 
             if (file.Length > maxSizeInMb * 1048576)
             {
-                return Problem("File bigger than 3mb is not allowed");
+                return Problem($"File bigger than {maxSizeInMb}mb is not allowed");
             }
 
             if (file.Length > 0)
@@ -88,7 +88,7 @@ namespace Backend.Controllers
 
             }
 
-            return Ok(new { name = Constants.INPUT_FILENAME });
+            return Ok(new { name = uniqueFilename });
         }
     }
 }
