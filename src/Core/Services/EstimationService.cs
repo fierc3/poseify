@@ -62,10 +62,30 @@ namespace Core.Services
             fileExtension = fileExtension.Replace(".", "");
 
             var estimation = RegisterEstimation(displayName, tags, userGuid);
-            if(estimation == null)
+
+            if (estimation == null)
             {
                 throw new Exception("Estimation could not be registered");
             }
+
+            using (var session = _store.OpenSession())
+            {
+                var needsToBeQueued = session.Query<Estimation>().Where(x => x.State == EstimationState.Processing).Count() > Constants.MAXPROCESSING;
+                if (needsToBeQueued)
+                {
+                    estimation.State = EstimationState.Queued;
+                    estimation.StateText = "Currently queued, processing continues when gpu is available";
+                    UpdateEstimation(estimation);
+                    _ = QueueService.AddToQueueAsync(estimation, this, _store, userGuid, directory, fileName, fileExtension);
+                    return estimation;
+                }
+            }
+
+            return RunFile(userGuid, directory, fileName, fileExtension, estimation);
+        }
+
+        public Estimation RunFile(string userGuid, string directory, string fileName, string fileExtension, Estimation? estimation)
+        {
             try
             {
                 RunEstimation(userGuid, directory, fileName, fileExtension, estimation.InternalGuid);
@@ -73,16 +93,24 @@ namespace Core.Services
             catch
             {
                 estimation.State = EstimationState.Failed;
+                estimation.StateText = "Error during run of estimation";
                 UpdateEstimation(estimation);
                 throw;
             }
 
             string fileLocation = $"{directory}\\{userGuid}\\{fileName}";
             string estimationPath = $"{fileLocation}.{fileExtension}.npz";
+            string npyPath = $"{fileLocation}_result.npy";
+            string inputPath = $"{fileLocation}.{fileExtension}";
             string previewPath = $"{fileLocation}_result.mp4";
+            string jointPath = $"{fileLocation}_result.json";
 
-            StoreEstimationResultToDb(estimation, estimationPath, previewPath, fileName);
-            File.Delete($"{fileLocation}.mp4");
+            StoreEstimationResultToDb(estimation, estimationPath, jointPath, previewPath, fileName);
+            File.Delete($"{jointPath}");
+            File.Delete($"{previewPath}");
+            File.Delete($"{estimationPath}");
+            File.Delete($"{npyPath}");
+            File.Delete($"{inputPath}");
             return estimation;
         }
 
@@ -96,7 +124,7 @@ namespace Core.Services
                     throw new Exception("Estimation could not be found");
                 }
 
-                var attachmentName = attachmentType == AttachmentType.Joints ? Constants.JOINTS_FILENAME : Constants.PREVIEW_FILENAME;
+                var attachmentName = attachmentType == AttachmentType.Joints ? Constants.JOINTS_FILENAME : attachmentType == AttachmentType.Preview ? Constants.PREVIEW_FILENAME : Constants.NPZ_FILENAME;
                 var result = session.Advanced.Attachments.Get(estimation, attachmentName);
                 return result.Stream;
             }
@@ -153,7 +181,7 @@ namespace Core.Services
                 {
                     if (totalFrames == 0 && ev.Data.Contains("Total Frames:"))
                     {
-                        totalFrames = int.Parse(ev.Data.Split(':').Last());
+                        totalFrames = int.TryParse(ev.Data.Split(':').Last(), out totalFrames) ? totalFrames : 666;
                     }
                     if (ev.Data.Contains("Frame") && ev.Data.Contains("processed") || ev.Data.Contains($"/{totalFrames}")) // before or is infer2d after or is run.py
                     {
@@ -186,7 +214,7 @@ namespace Core.Services
         }
 
         //create a new estimation entry and attach a file to it
-        private void StoreEstimationResultToDb(Estimation estimation, string estimationPath, string previewPath, string file_name)
+        private void StoreEstimationResultToDb(Estimation estimation, string estimationPath, string jointPath, string previewPath, string file_name)
         {
             if(estimation == null)
             {
@@ -196,12 +224,15 @@ namespace Core.Services
             string guid = estimation.InternalGuid;
             using (var session = _store.OpenSession())
             using (var estimationFile = File.Open(estimationPath, FileMode.Open))
+            using (var jointFile = File.Open(jointPath, FileMode.Open))
             using (var previewFile = File.Open(previewPath, FileMode.Open))
             {
                 estimation.State = EstimationState.Success;
+                estimation.StateText = "Successfull estimation";
                 session.Store(estimation, guid);
-                session.Advanced.Attachments.Store(guid, Constants.JOINTS_FILENAME, estimationFile);
+                session.Advanced.Attachments.Store(guid, Constants.NPZ_FILENAME, estimationFile);
                 session.Advanced.Attachments.Store(guid, Constants.PREVIEW_FILENAME, previewFile);
+                session.Advanced.Attachments.Store(guid, Constants.JOINTS_FILENAME, jointFile);
                 session.SaveChanges();
             }
         }

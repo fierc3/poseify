@@ -24,7 +24,8 @@ function useClaims() {
     {
       staleTime: Infinity,
       cacheTime: Infinity,
-      retry: false
+      retry: false,
+      refetchInterval: 1000 * 15,
     }
   )
 }

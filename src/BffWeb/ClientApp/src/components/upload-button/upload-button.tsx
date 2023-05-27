@@ -1,22 +1,23 @@
 import { BaseSyntheticEvent, FC, useState } from "react";
-import { Alert, Backdrop, Button, Checkbox, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Fab, ListItemText, MenuItem, Select, SelectChangeEvent, Snackbar, Stack, TextField, Typography } from "@mui/material";
+import { Alert, Backdrop, Button, Checkbox, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Fab, ListItemText, MenuItem, Select, SelectChangeEvent, Snackbar, Stack, TextField, Tooltip, Typography } from "@mui/material";
 import axios from "axios";
 import NavigationIcon from '@mui/icons-material/Navigation';
 import useEstimations from "../../helpers/estimations";
 
-export const UploadButton: FC = () => {
+export const UploadButton: FC<{ blocked: boolean }> = ({ blocked }) => {
 
     const { refetch } = useEstimations();
-    const [openUpoadDialog, setOpenUploadDialog] = useState(false);
+    const [openUploadDialog, setOpenUploadDialog] = useState(false);
 
     const handleClickOpen = () => {
         setOpenUploadDialog(true);
     };
 
-    const reset = () =>{
+    const reset = () => {
         setEstimationName("");
         setTags([]);
         setSelectedFilePath("");
+        setWarningFile("");
     }
 
     const handleClose = () => {
@@ -27,6 +28,7 @@ export const UploadButton: FC = () => {
     const [tags, setTags] = useState<string[]>([]);
     const [estimationName, setEstimationName] = useState<string>("");
     const [selectedFilePath, setSelectedFilePath] = useState<string>("");
+    const [warningFile, setWarningFile] = useState<string>("");
     const [isUploading, setIsUploading] = useState<boolean>(false);
     const [errorSnack, setErrorSnack] = useState<boolean>(false);
     const [successSnack, setSuccessSnack] = useState<boolean>(false);
@@ -82,16 +84,19 @@ export const UploadButton: FC = () => {
         }
 
         //setValue("thumbnail", res.data.url);
-        setTimeout(() => setIsUploading(false), 200);
-        refetch();
+        setTimeout(() => (setIsUploading(false), refetch()), 200);
     };
 
     return (
         <>
-            <Fab onClick={handleClickOpen} variant="extended" size="small" color="primary" aria-label="add">
-                <NavigationIcon sx={{ mr: 1 }} />
-                Upload Estimation
-            </Fab>
+            <Tooltip title={blocked ? "You have too many estimations queued, please wait" : ""}>
+                <span>
+                    <Fab disabled={blocked} onClick={handleClickOpen} variant="extended" size="small" color="primary" aria-label="add">
+                        <NavigationIcon sx={{ mr: 1 }} />
+                        Upload Estimation
+                    </Fab>
+                </span>
+            </Tooltip>
             <Backdrop
                 sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
                 open={isUploading}
@@ -127,19 +132,17 @@ export const UploadButton: FC = () => {
                     Estimation uploaded, now processing!
                 </Alert>
             </Snackbar>
-            {openUpoadDialog && (<Dialog fullWidth open={openUpoadDialog} onClose={handleClose}>
+            {openUploadDialog && !blocked && (<Dialog fullWidth open={openUploadDialog} onClose={handleClose}>
                 <DialogTitle>Upload</DialogTitle>
                 <DialogContent>
                     <Typography variant="h5">1. Information</Typography>
-                    <DialogContentText>
-                        To create a new estimation we need some information.
-                    </DialogContentText>
                     <Stack
                         component="form"
                         spacing={2}
                         noValidate
                         autoComplete="off"
                     >
+                        <Typography variant="subtitle2">1.1 Give your estimation a name to easily find it again later.</Typography>
                         <TextField
                             autoFocus
                             margin="dense"
@@ -151,7 +154,9 @@ export const UploadButton: FC = () => {
                             required
                             value={estimationName}
                             onChange={(e) => setEstimationName(e.target.value)}
+                            sx={{ marginTop: "5px" }}
                         />
+                        <Typography variant="subtitle2">1.2 Select tags to improve organization in the grid.</Typography>
                         <Select
                             labelId="demo-multiple-checkbox-label"
                             id="demo-multiple-checkbox"
@@ -182,19 +187,31 @@ export const UploadButton: FC = () => {
                         </DialogContentText>
                         <Alert variant="filled" severity="success">- USE STATIC VIDEOS WITH SINGLE PERSON IN FRAME</Alert>
                         <Alert variant="filled" severity="success">- USE WELL LIT VIDEOS</Alert>
+                        <Alert variant="filled" severity="success">- CONSIDER USING VIDEOS WITH RESOLUTION LOWER THAN 720p</Alert>
                         <Alert variant="filled" severity="warning">- DO NOT USE VIDEOS WITH MULTIPLE PEOPLE IN FRAME</Alert>
                         <Button variant="contained" component="label">
                             Upload
-                            <input onInput={(x: BaseSyntheticEvent) => setSelectedFilePath(x.target.value.replace(/^.*[\\\/]/, ''))} id="fileInput" hidden accept="video/*" multiple type="file" />
+                            <input onInput={(x: BaseSyntheticEvent) => {
+                                const maxSizeInMb = 50;
+                                if(x.currentTarget.files[0].size > maxSizeInMb * 1048576){
+                                    setWarningFile(`File is bigger than ${maxSizeInMb}Mb`)
+                                    setSelectedFilePath("")
+                                    return;
+                                 };
+                                 setWarningFile("");
+                                setSelectedFilePath(x.target.value.replace(/^.*[\\\/]/, ''))
+                            }}
+                                id="fileInput" hidden accept="video/*" multiple type="file" />
                         </Button>
                         <DialogContentText>
                             {selectedFilePath}
+                            {warningFile}
                         </DialogContentText>
                     </Stack>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>Cancel</Button>
-                    <Button disabled={selectedFilePath.length < 1 || estimationName.length < 1 || tags.length < 1} onClick={onSubmitFile}>Start Upload</Button>
+                    <Button disabled={selectedFilePath.length < 1 || estimationName.length < 1} onClick={onSubmitFile}>Start Upload</Button>
                 </DialogActions>
             </Dialog>)}
         </>

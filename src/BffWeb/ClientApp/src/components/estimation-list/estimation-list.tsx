@@ -6,7 +6,8 @@ import moment from "moment";
 import ProcessingIcon from '@mui/icons-material/DirectionsRun';
 import SuccessIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
-import { Button } from "@mui/material";
+import QueueIcon from '@mui/icons-material/Queue';
+import { Button, Tooltip } from "@mui/material";
 import { EstimationView } from "../estimation-view/estimation-view";
 import axios from "axios";
 
@@ -29,7 +30,8 @@ export const EstimationList: FC = () => {
       flex: 3,
       renderCell: (params) => {
         return (<>
-          {params.value === EstimationState.Processing && (<ProcessingIcon color="action" />)}
+          {params.value === EstimationState.Processing && (<Tooltip title="Processing on the GPU"><span><ProcessingIcon color="action" /></span></Tooltip>)}
+          {params.value === EstimationState.Queued && (<Tooltip title="Queued, waiting for gpu to become available"><span><QueueIcon color="action" /></span></Tooltip>)}
           {params.value === EstimationState.Failed && (<ErrorIcon color="error" />)}
           {params.value === EstimationState.Success && (<SuccessIcon color="success" />)}
         </>)
@@ -65,8 +67,8 @@ export const EstimationList: FC = () => {
           </Button>
           <Button
             sx={{ marginLeft: 1 }}
-            onClick={(e) => axios.delete(`/api/DeleteEstimation?estimationId=${params.row.internalGuid}`, { headers: { 'X-CSRF': '1' } }).then(res =>{
-              if(res.status === 200){
+            onClick={(e) => axios.delete(`/api/DeleteEstimation?estimationId=${params.row.internalGuid}`, { headers: { 'X-CSRF': '1' } }).then(res => {
+              if (res.status === 200) {
                 refetch();
               }
             })}
@@ -88,7 +90,7 @@ export const EstimationList: FC = () => {
 
   return (
     <>
-      <EstimationView estimation={selectedEstimation} open={selectedEstimation != null} handleClose={() => setSelectedEstimation(null) }/>
+      <EstimationView estimation={selectedEstimation} open={selectedEstimation != null} handleClose={() => setSelectedEstimation(null)} />
       <DataGrid columnVisibilityModel={{ tags: window.innerWidth > 500, modifiedDate: window.innerWidth > 500 }} loading={!isDataLoaded} rows={estimations} getRowId={(row: IEstimation) => row.internalGuid} columns={startColumns} />
     </>
   );

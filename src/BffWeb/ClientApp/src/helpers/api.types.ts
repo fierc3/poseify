@@ -26,7 +26,8 @@ export interface IProblemDetails {
 export enum EstimationState{
     Success = "Success",
     Processing ="Processing",
-    Failed = "Failed"
+    Failed = "Failed",
+    Queued ="Queued",
 }
 
 export interface IEstimation {
@@ -40,6 +41,7 @@ export interface IEstimation {
 
 export enum AttachmentType{
     Joints = "Joints",
-    Preview ="Preview"
+    Preview ="Preview",
+    Npz = "Npz"
 }
 
