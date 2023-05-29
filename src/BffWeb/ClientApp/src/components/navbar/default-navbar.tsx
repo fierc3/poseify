@@ -213,7 +213,7 @@ const DefaultNavbar: FC = () => {
               </Menu>
             </>) : (
               <IconButton onClick={() => openUrl("/bff/login?returnUrl=/")} sx={{ p: 0 }}>
-                <LoginIcon color='secondary' />
+                <LoginIcon color='secondary' /> <Typography paddingLeft={1} color="white" variant='subtitle1'> Login </Typography>
               </IconButton>)}
           </Box>
         </Toolbar>
