@@ -26,6 +26,9 @@ const Home: FC = () => {
             progress, or a filmmaker creating stunning action scenes, our
             technology can help you achieve your goals.
           </Typography>
+          <Typography variant="body1" paddingTop={5}>
+              <b>LOGIN</b> TO GET STARTED NOW
+          </Typography>
         </Grid>
         <Grid item xs={12} maxWidth={"xl"}>
         <Divider variant="middle" />
