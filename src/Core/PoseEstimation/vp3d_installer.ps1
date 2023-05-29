@@ -1,18 +1,16 @@
 
-#########################################################
-# Copyright Maroccan Money Squad and Bulgarians in Lidl #
-#########################################################
+################################################
+# VidePose3d and requirements install script   #
+################################################
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-$python_url = "https://www.python.org/ftp/python/3.7.9/python-3.7.9.exe"
 $git_url = "https://github.com/git-for-windows/git/releases/download/v2.39.2.windows.1/Git-2.39.2-64-bit.exe"
 $vp3d_url = "https://github.com/MadMeister/VideoPose3D_poseify.git"
 $msbuild_url = "https://aka.ms/vs/17/release/vs_buildtools.exe"
 $detectron_url = "git+https://github.com/fierc3/detectron2-python-37"
 $pretrained_model_url = "https://dl.fbaipublicfiles.com/video-pose-3d/pretrained_h36m_detectron_coco.bin"
 
-$python_dest = "C:\Python37"
 $git_dest = "C:\Program Files\Git"
 $vp3d_dest = Split-Path -parent $PSCommandPath
 $vp3d_dest = $vp3d_dest+"\vp3d"
@@ -21,7 +19,6 @@ $pretrained_model_dest = "$vp3d_dest\checkpoint\pretrained_h36m_detectron_coco.b
 
 
 "This Script will install the following things:
-    - python 3.7.9 in $python_dest
     - git in $git_dest
     - videopose3d in $vp3d_dest
     - msbuildtools c++ in $msbuild_dest
@@ -29,20 +26,6 @@ $pretrained_model_dest = "$vp3d_dest\checkpoint\pretrained_h36m_detectron_coco.b
 
 if you would like to change any paths please edit the paths in this powershell script"
 
-$python_conf = Read-Host "do you want to install python at default location? (y/n)"
-
-if ($python_conf -eq 'y') {
-    try {
-        "installing python"
-        Invoke-WebRequest -Uri $python_url -OutFile $python_temp_installer
-        Start-Process $python_temp_installer -Wait -ArgumentList '/quiet InstallAllUsers=0 PrependPath=1 Include_test=0'
-        Remove-Item $python_temp_installer
-    }
-    catch {
-        Write-Host "error while downloading and installing python"
-        Write-Host $_
-    }
-}
 
 $git_conf = Read-Host "do you want to install git to $git_dest ? (y/n)"
 
