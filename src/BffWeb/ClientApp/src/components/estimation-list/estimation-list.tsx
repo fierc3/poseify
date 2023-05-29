@@ -2,16 +2,17 @@ import { FC, useEffect, useState } from "react";
 import useEstimations from "../../helpers/estimations";
 import { EstimationState, IEstimation } from "../../helpers/api.types";
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import moment from "moment";
+import moment from 'moment-timezone';
 import ProcessingIcon from '@mui/icons-material/DirectionsRun';
 import SuccessIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import QueueIcon from '@mui/icons-material/Queue';
-import { Button, Tooltip } from "@mui/material";
+import { Button, Tooltip, Typography } from "@mui/material";
 import { EstimationView } from "../estimation-view/estimation-view";
 import axios from "axios";
 
 export const EstimationList: FC = () => {
+  moment.tz.setDefault("Europe/Zurich");
   const { data: rawEstimations, isFetched, refetch } = useEstimations();
   const [estimations, setEstimations] = useState<IEstimation[]>([]);
   const [isDataLoaded, setDataLoad] = useState<boolean>(false);
