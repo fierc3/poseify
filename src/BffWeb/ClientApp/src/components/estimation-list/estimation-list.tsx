@@ -31,10 +31,10 @@ export const EstimationList: FC = () => {
       flex: 5,
       renderCell: (params) => {
         return (<>
-          {params.value === EstimationState.Processing && (<Tooltip title="Processing on the GPU"><Typography variant="body2"><ProcessingIcon color="action" /> Processing</Typography></Tooltip>)}
-          {params.value === EstimationState.Queued && (<Tooltip title="Queued, waiting for gpu to become available"><Typography variant="body2"><QueueIcon color="action" /> Queued</Typography></Tooltip>)}
-          {params.value === EstimationState.Failed && (<Tooltip title={"Something went wrong: "+ estimations.find(x => x.internalGuid === params.row.internalGuid)?.stateText ?? 'unknown'}><Typography variant="body2"><ErrorIcon color="error" />Failed</Typography></Tooltip>)}
-          {params.value === EstimationState.Success && (<Typography variant="body2"><SuccessIcon color="success" />Ok</Typography>)}
+          {params.value === EstimationState.Processing && (<Tooltip title="Processing on the GPU"><Typography fontSize={11} variant="body2"><ProcessingIcon color="action" /> Processing</Typography></Tooltip>)}
+          {params.value === EstimationState.Queued && (<Tooltip title="Queued, waiting for gpu to become available"><Typography fontSize={11} variant="body2"><QueueIcon color="action" /> Queued</Typography></Tooltip>)}
+          {params.value === EstimationState.Failed && (<Tooltip title={"Something went wrong: "+ estimations.find(x => x.internalGuid === params.row.internalGuid)?.stateText ?? 'unknown'}><Typography fontSize={11} variant="body2"><ErrorIcon color="error" />Failed</Typography></Tooltip>)}
+          {params.value === EstimationState.Success && (<Typography fontSize={11} variant="body2"><SuccessIcon color="success" />Ok</Typography>)}
         </>)
       }
     },
