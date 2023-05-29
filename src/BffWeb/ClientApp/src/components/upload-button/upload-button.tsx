@@ -3,6 +3,7 @@ import { Alert, Backdrop, Button, Checkbox, CircularProgress, Dialog, DialogActi
 import axios from "axios";
 import NavigationIcon from '@mui/icons-material/Navigation';
 import useEstimations from "../../helpers/estimations";
+import FileUploadIcon from '@mui/icons-material/FileUpload';
 
 export const UploadButton: FC<{ blocked: boolean }> = ({ blocked }) => {
 
@@ -189,8 +190,9 @@ export const UploadButton: FC<{ blocked: boolean }> = ({ blocked }) => {
                         <Alert variant="filled" severity="success">- USE WELL LIT VIDEOS</Alert>
                         <Alert variant="filled" severity="success">- CONSIDER USING VIDEOS WITH RESOLUTION LOWER THAN 720p</Alert>
                         <Alert variant="filled" severity="warning">- DO NOT USE VIDEOS WITH MULTIPLE PEOPLE IN FRAME</Alert>
-                        <Button variant="contained" component="label">
-                            Upload
+                        <Button variant="contained" component="label" size="large" sx={{fontSize: 20, fontWeight: 300}}>
+                            <FileUploadIcon/>
+                            Select Video File
                             <input onInput={(x: BaseSyntheticEvent) => {
                                 const maxSizeInMb = 50;
                                 if(x.currentTarget.files[0].size > maxSizeInMb * 1048576){

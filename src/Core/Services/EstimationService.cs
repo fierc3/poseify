@@ -1,6 +1,7 @@
 ﻿using Core.Models;
 using Raven.Client.Documents;
 using System.Diagnostics;
+using System.IO;
 
 namespace Core.Services
 {
@@ -55,8 +56,21 @@ namespace Core.Services
             session.Store(editedEstimation, editedEstimation.InternalGuid);
             session.SaveChanges();
         }
+
+        private Estimation? SetEstimationToFailed(string estimationid, string errorMessage)
+        {
+            using (var session = _store.OpenSession())
+            {
+                var estimation = session.Query<Estimation>().Where(x => x.InternalGuid == estimationid).FirstOrDefault();
+                if (estimation == null) return null;
+                estimation.State = EstimationState.Failed;
+                estimation.StateText = errorMessage;
+                UpdateEstimation(estimation);
+                return estimation;
+            }
+        }
     
-        public Estimation HandleUploadedFile(string userGuid, string directory, string fileName, string fileExtension, string displayName, IEnumerable<string> tags)
+        public void HandleUploadedFile(string userGuid, string directory, string fileName, string fileExtension, string displayName, IEnumerable<string> tags)
         {
             // ensure file extension is without dot
             fileExtension = fileExtension.Replace(".", "");
@@ -77,27 +91,15 @@ namespace Core.Services
                     estimation.StateText = "Currently queued, processing continues when gpu is available";
                     UpdateEstimation(estimation);
                     _ = QueueService.AddToQueueAsync(estimation, this, _store, userGuid, directory, fileName, fileExtension);
-                    return estimation;
+                    return;
                 }
             }
 
-            return RunFile(userGuid, directory, fileName, fileExtension, estimation);
+            RunFile(userGuid, directory, fileName, fileExtension, estimation);
         }
 
-        public Estimation RunFile(string userGuid, string directory, string fileName, string fileExtension, Estimation? estimation)
+        public void RunFile(string userGuid, string directory, string fileName, string fileExtension, Estimation estimation)
         {
-            try
-            {
-                RunEstimation(userGuid, directory, fileName, fileExtension, estimation.InternalGuid);
-            }
-            catch
-            {
-                estimation.State = EstimationState.Failed;
-                estimation.StateText = "Error during run of estimation";
-                UpdateEstimation(estimation);
-                throw;
-            }
-
             string fileLocation = $"{directory}\\{userGuid}\\{fileName}";
             string estimationPath = $"{fileLocation}.{fileExtension}.npz";
             string npyPath = $"{fileLocation}_result.npy";
@@ -105,13 +107,25 @@ namespace Core.Services
             string previewPath = $"{fileLocation}_result.mp4";
             string jointPath = $"{fileLocation}_result.json";
 
+            try
+            {
+                RunEstimation(userGuid, directory, fileName, fileExtension, estimation.InternalGuid);
+                File.Delete($"{inputPath}");
+            }
+            catch (Exception ex)
+            {
+                SetEstimationToFailed(estimation.InternalGuid, "Error during run of estimation: " + ex.Message);
+                File.Delete($"{inputPath}");
+                return;
+            }
+
             StoreEstimationResultToDb(estimation, estimationPath, jointPath, previewPath, fileName);
             File.Delete($"{jointPath}");
             File.Delete($"{previewPath}");
             File.Delete($"{estimationPath}");
             File.Delete($"{npyPath}");
-            File.Delete($"{inputPath}");
-            return estimation;
+
+            return;
         }
 
         public Stream? GetEstimationAttachment(string estimationid, AttachmentType attachmentType, string userGuid)
@@ -154,7 +168,6 @@ namespace Core.Services
             }
         }
 
-        //todo make this async?
         private void RunEstimation(string userGuid, string directory, string fileName, string fileExtension, string estimationGuid)
         {
             int totalFrames = 0;
@@ -198,12 +211,19 @@ namespace Core.Services
                 }
             };
 
-            estimationProcess.Start();
-            estimationProcess.BeginOutputReadLine();
-            estimationProcess.BeginErrorReadLine();
-            RunningProcesses.Add(estimationGuid, estimationProcess);
-            estimationProcess.WaitForExit();
-            RunningProcesses.Remove(estimationGuid);
+            try
+            {
+                estimationProcess.Start();
+                estimationProcess.BeginOutputReadLine();
+                estimationProcess.BeginErrorReadLine();
+                RunningProcesses.Add(estimationGuid, estimationProcess);
+                estimationProcess.WaitForExit();
+                RunningProcesses.Remove(estimationGuid);
+            }
+            catch (Exception ex)
+            {
+                SetEstimationToFailed(estimationGuid, $"Error during execution of python process of estimation {estimationGuid}: " + ex.Message);
+            }
 
             if (exception != null)
             {

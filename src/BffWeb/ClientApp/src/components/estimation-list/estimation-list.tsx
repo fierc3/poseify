@@ -2,16 +2,17 @@ import { FC, useEffect, useState } from "react";
 import useEstimations from "../../helpers/estimations";
 import { EstimationState, IEstimation } from "../../helpers/api.types";
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import moment from "moment";
+import moment from 'moment-timezone';
 import ProcessingIcon from '@mui/icons-material/DirectionsRun';
 import SuccessIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import QueueIcon from '@mui/icons-material/Queue';
-import { Button, Tooltip } from "@mui/material";
+import { Button, Tooltip, Typography } from "@mui/material";
 import { EstimationView } from "../estimation-view/estimation-view";
 import axios from "axios";
 
 export const EstimationList: FC = () => {
+  moment.tz.setDefault("Europe/Zurich");
   const { data: rawEstimations, isFetched, refetch } = useEstimations();
   const [estimations, setEstimations] = useState<IEstimation[]>([]);
   const [isDataLoaded, setDataLoad] = useState<boolean>(false);
@@ -27,13 +28,13 @@ export const EstimationList: FC = () => {
     {
       headerName: "State",
       field: "state",
-      flex: 3,
+      flex: 5,
       renderCell: (params) => {
         return (<>
-          {params.value === EstimationState.Processing && (<Tooltip title="Processing on the GPU"><span><ProcessingIcon color="action" /></span></Tooltip>)}
-          {params.value === EstimationState.Queued && (<Tooltip title="Queued, waiting for gpu to become available"><span><QueueIcon color="action" /></span></Tooltip>)}
-          {params.value === EstimationState.Failed && (<ErrorIcon color="error" />)}
-          {params.value === EstimationState.Success && (<SuccessIcon color="success" />)}
+          {params.value === EstimationState.Processing && (<Tooltip title="Processing on the GPU"><Typography fontSize={11} variant="body2"><ProcessingIcon color="action" /> Processing</Typography></Tooltip>)}
+          {params.value === EstimationState.Queued && (<Tooltip title="Queued, waiting for gpu to become available"><Typography fontSize={11} variant="body2"><QueueIcon color="action" /> Queued</Typography></Tooltip>)}
+          {params.value === EstimationState.Failed && (<Tooltip title={"Something went wrong: "+ estimations.find(x => x.internalGuid === params.row.internalGuid)?.stateText ?? 'unknown'}><Typography fontSize={11} variant="body2"><ErrorIcon color="error" />Failed</Typography></Tooltip>)}
+          {params.value === EstimationState.Success && (<Typography fontSize={11} variant="body2"><SuccessIcon color="success" />Ok</Typography>)}
         </>)
       }
     },

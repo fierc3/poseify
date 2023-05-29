@@ -36,7 +36,8 @@ export interface IEstimation {
     tags: string[];
     uploadingProfile: string;
     modifiedDate: Date;
-    state: EstimationState
+    state: EstimationState,
+    stateText: string
 }
 
 export enum AttachmentType{
