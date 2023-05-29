@@ -19,7 +19,6 @@ const App = () => {
             {publicRoutes}
             <Route element={<AuthUserLayout />}>{loggedInRoutes}</Route>
           </Routes>
-          <ReactQueryDevtools initialIsOpen={false}></ReactQueryDevtools>
         </ThemeProvider>
       </QueryClientProvider>
     </div>
