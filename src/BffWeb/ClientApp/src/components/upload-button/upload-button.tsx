@@ -192,7 +192,7 @@ export const UploadButton: FC<{ blocked: boolean }> = ({ blocked }) => {
                         <Alert variant="filled" severity="warning">- DO NOT USE VIDEOS WITH MULTIPLE PEOPLE IN FRAME</Alert>
                         <Button variant="contained" component="label" size="large" sx={{fontSize: 20, fontWeight: 300}}>
                             <FileUploadIcon/>
-                            Select Video File
+                            Select Video File (.mp4)
                             <input onInput={(x: BaseSyntheticEvent) => {
                                 const maxSizeInMb = 50;
                                 if(x.currentTarget.files[0].size > maxSizeInMb * 1048576){
@@ -203,7 +203,7 @@ export const UploadButton: FC<{ blocked: boolean }> = ({ blocked }) => {
                                  setWarningFile("");
                                 setSelectedFilePath(x.target.value.replace(/^.*[\\\/]/, ''))
                             }}
-                                id="fileInput" hidden accept="video/*" multiple type="file" />
+                                id="fileInput" hidden accept="video/mp4" multiple type="file" />
                         </Button>
                         <DialogContentText>
                             {selectedFilePath}

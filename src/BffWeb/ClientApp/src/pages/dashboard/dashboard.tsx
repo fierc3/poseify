@@ -60,7 +60,7 @@ const Dashboard = () => {
                 - 20mb = 2min
               </Typography>
               <Typography color={"yellow"} alignContent={"center"} variant="subtitle2" >
-                Reported Issues: IF GRID LOADS FOREVER PLEASE RELOGIN
+                <b>Reported Issues: </b> <br/> IF GRID LOADS FOREVER PLEASE RELOGIN <br/> Currently only support for .mp4 files
               </Typography>
             </Box>
           </Stack>
