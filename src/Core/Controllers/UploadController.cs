@@ -26,6 +26,7 @@ namespace Backend.Controllers
 
         [ActionName("PostUpload")]
         [HttpPost(Name = "PostUpload")]
+        [RequestSizeLimit(100_000_000)]
         public async Task<IActionResult> PostUploadAsync([FromForm] UploadModel uploadModel)
         {
             if (uploadModel.FormFile == null)

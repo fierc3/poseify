@@ -4,6 +4,11 @@ using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 100_000_000;
+});
+
 // Add services to the container.
 builder.Services.AddCors(options =>
 {
