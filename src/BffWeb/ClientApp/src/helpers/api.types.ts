@@ -43,6 +43,7 @@ export interface IEstimation {
 export enum AttachmentType{
     Joints = "Joints",
     Preview ="Preview",
-    Npz = "Npz"
+    Npz = "Npz",
+    Bvh = "Bvh"
 }
 

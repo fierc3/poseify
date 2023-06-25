@@ -5,5 +5,6 @@ public enum AttachmentType
 {
     Preview,
     Joints,
-    Npz
+    Npz,
+    Bvh
 }

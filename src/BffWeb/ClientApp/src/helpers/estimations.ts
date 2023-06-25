@@ -13,13 +13,9 @@ const config = {
   }
 }
 
-
-
 const fetchData = async () =>
   axios.get('/api/GetUserEstimations', config)
   .then((res) => res.data as IEstimation[]);
-
-
 
 function useEstimations() {
   return useQuery(
