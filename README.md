@@ -17,3 +17,6 @@ All guides like developer guidelines or installation guides can be found in the 
 
 ## Demo of 1.0.0
 https://youtu.be/sN8toxFbWoY
+
+## PREVIEW OF MOTION CAPTURE
+https://www.youtube.com/watch?v=q8PgEHOVgWc
