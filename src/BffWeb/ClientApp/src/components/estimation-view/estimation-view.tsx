@@ -28,7 +28,7 @@ export const EstimationView: FC<{ estimation: IEstimation | null, open: boolean,
                 const url = window.URL.createObjectURL(new Blob([res.data]));
                 const link = document.createElement('a');
                 link.href = url;
-                var fileName = type === AttachmentType.Joints ? estimation.displayName + '.json' : type === AttachmentType.Preview ? estimation.displayName + '.mp4' : estimation.displayName + '.npz'
+                var fileName = type === AttachmentType.Joints ? estimation.displayName + '.json' : type === AttachmentType.Preview ? estimation.displayName + '.mp4' :  type === AttachmentType.Bvh ? estimation.displayName + '.bvh' : estimation.displayName + '.npz'
                 link.setAttribute('download', fileName); //or any other extension
                 document.body.appendChild(link);
                 link.click();
@@ -67,6 +67,10 @@ export const EstimationView: FC<{ estimation: IEstimation | null, open: boolean,
                         <IconButton size="small" onClick={() => download(props.estimation, AttachmentType.Preview)} autoFocus>
                         <Download fontSize="small"/>
                             Preview
+                        </IconButton>
+                        <IconButton size="small" onClick={() => download(props.estimation, AttachmentType.Bvh)} autoFocus>
+                        <Download fontSize="small"/>
+                            BVH
                         </IconButton>
                         <IconButton size="small" onClick={props.handleClose} autoFocus>
                             close

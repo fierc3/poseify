@@ -3,6 +3,7 @@ import subprocess
 import argparse
 import sys
 import os
+import output2bvh
 
 # Copyright Shadow Wizard Money Gang & Mind Goblin
 
@@ -101,6 +102,11 @@ def estimate_pose_for_video(file_dir, user_id, guid, file_extension, new_file_ex
     p2 = subprocess.run(command, cwd=f'{wdir}')
     if p2.returncode != 0:
         raise Exception( f'Invalid result in run.py: { p2.returncode }' )
+    
+    print('------------------------------')
+    print('Generating bvh data with  output2bvh.py')
+    print('------------------------------')
+    output2bvh.read_bvh_data(f"{file_user_guid}_result.json", f"{file_user_guid}_motioncapture.bvh")
 
 
 def ffmpeg_conversion(input_video_location, file_user_guid, new_file_extension=False, scale_fps=False):

@@ -106,6 +106,7 @@ namespace Core.Services
             string inputPath = $"{fileLocation}.{fileExtension}";
             string previewPath = $"{fileLocation}_result.mp4";
             string jointPath = $"{fileLocation}_result.json";
+            string bvhPath = $"{fileLocation}_motioncapture.bvh";
 
             try
             {
@@ -119,11 +120,12 @@ namespace Core.Services
                 return;
             }
 
-            StoreEstimationResultToDb(estimation, estimationPath, jointPath, previewPath, fileName);
+            StoreEstimationResultToDb(estimation, estimationPath, jointPath, previewPath, fileName, bvhPath);
             File.Delete($"{jointPath}");
             File.Delete($"{previewPath}");
             File.Delete($"{estimationPath}");
             File.Delete($"{npyPath}");
+            File.Delete($"{bvhPath}");
 
             return;
         }
@@ -138,7 +140,7 @@ namespace Core.Services
                     throw new Exception("Estimation could not be found");
                 }
 
-                var attachmentName = attachmentType == AttachmentType.Joints ? Constants.JOINTS_FILENAME : attachmentType == AttachmentType.Preview ? Constants.PREVIEW_FILENAME : Constants.NPZ_FILENAME;
+                var attachmentName = attachmentType == AttachmentType.Joints ? Constants.JOINTS_FILENAME : attachmentType == AttachmentType.Preview ? Constants.PREVIEW_FILENAME : attachmentType == AttachmentType.Bvh ? Constants.MOTIONCAPTURE_FILENAME : Constants.NPZ_FILENAME;
                 var result = session.Advanced.Attachments.Get(estimation, attachmentName);
                 return result.Stream;
             }
@@ -234,7 +236,7 @@ namespace Core.Services
         }
 
         //create a new estimation entry and attach a file to it
-        private void StoreEstimationResultToDb(Estimation estimation, string estimationPath, string jointPath, string previewPath, string file_name)
+        private void StoreEstimationResultToDb(Estimation estimation, string estimationPath, string jointPath, string previewPath, string file_name, string bvhPath)
         {
             if(estimation == null)
             {
@@ -245,6 +247,7 @@ namespace Core.Services
             using (var session = _store.OpenSession())
             using (var estimationFile = File.Open(estimationPath, FileMode.Open))
             using (var jointFile = File.Open(jointPath, FileMode.Open))
+            using (var bvhFile = File.Open(bvhPath, FileMode.Open))
             using (var previewFile = File.Open(previewPath, FileMode.Open))
             {
                 estimation.State = EstimationState.Success;
@@ -253,6 +256,7 @@ namespace Core.Services
                 session.Advanced.Attachments.Store(guid, Constants.NPZ_FILENAME, estimationFile);
                 session.Advanced.Attachments.Store(guid, Constants.PREVIEW_FILENAME, previewFile);
                 session.Advanced.Attachments.Store(guid, Constants.JOINTS_FILENAME, jointFile);
+                session.Advanced.Attachments.Store(guid, Constants.MOTIONCAPTURE_FILENAME, bvhFile);
                 session.SaveChanges();
             }
         }
