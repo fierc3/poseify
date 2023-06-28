@@ -15,6 +15,9 @@ At the latest release, Poseify supports the following pose-estimation algorithms
 ## Guides
 All guides like developer guidelines or installation guides can be found in the GitHub wiki
 
+## Academic Papers
+The academic papers can be requested via GitHub discussions
+
 ## Demo of 1.0.0
 https://youtu.be/sN8toxFbWoY
 
