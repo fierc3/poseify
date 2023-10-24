@@ -44,6 +44,7 @@ export enum AttachmentType{
     Joints = "Joints",
     Preview ="Preview",
     Npz = "Npz",
-    Bvh = "Bvh"
+    Bvh = "Bvh",
+    Fbx = "Fbx"
 }
 

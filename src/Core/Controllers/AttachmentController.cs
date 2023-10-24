@@ -39,8 +39,7 @@ namespace Backend.Controllers
                 return Problem("Couldn't load attachment");
             }
 
-            var attachmentName = attachmentType == AttachmentType.Joints ? Constants.JOINTS_FILENAME : attachmentType == AttachmentType.Preview ? Constants.PREVIEW_FILENAME : attachmentType == AttachmentType.Bvh ? Constants.MOTIONCAPTURE_FILENAME : Constants.NPZ_FILENAME;
-            return File(attachmentFile, "application/octet-stream", attachmentName);
+            return File(attachmentFile, "application/octet-stream", Constants.GetFilename(attachmentType));
         }
     }
 }
