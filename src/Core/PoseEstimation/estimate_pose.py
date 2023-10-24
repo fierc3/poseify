@@ -69,6 +69,7 @@ def estimate_pose_for_video(file_dir, user_id, guid, file_extension, new_file_ex
     estimation_result_location = f"{file_user_guid}_result"
 
     if new_file_extension or scale_fps:
+        print('###### Using FFmpeg conversion')
         input_video_location = ffmpeg_conversion(input_video_location, file_user_guid, new_file_extension, scale_fps)
         file_extension = new_file_extension or file_extension
     
@@ -118,9 +119,9 @@ def ffmpeg_conversion(input_video_location, file_user_guid, new_file_extension=F
         output_video_location = f"{file_user_guid}.{new_file_extension}"
     
     if scale_fps:
-        command = ['ffmpeg', '-hide_banner', '-loglevel', 'error','-y', '-i', f'{input_video_location}', '-filter', "minterpolate='fps=50'", '-crf', '0', f'{output_video_location}']
+        command = ['ffmpeg', '-hwaccel cuvid', '-hide_banner', '-loglevel', 'error','-y', '-i', f'{input_video_location}', '-filter', "minterpolate='fps=50'", '-crf', '0', f'{output_video_location}']
     else:
-        command = ['ffmpeg', '-hide_banner', '-loglevel', 'error','-y', '-i', f'{input_video_location}', '-crf', '0', f'{output_video_location}']
+        command = ['ffmpeg', '-hwaccel cuvid', '-hide_banner', '-loglevel', 'error','-y', '-i', f'{input_video_location}', '-crf', '0', f'{output_video_location}']
     subprocess.run(command)
     return output_video_location
 
