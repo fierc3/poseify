@@ -6,5 +6,6 @@ public enum AttachmentType
     Preview,
     Joints,
     Npz,
-    Bvh
+    Bvh,
+    Fbx
 }

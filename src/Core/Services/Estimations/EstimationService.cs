@@ -1,35 +1,42 @@
 ﻿using Core.Models;
+using Core.Services.Fbx;
+using Core.Services.Queues;
 using Raven.Client.Documents;
 using System.Diagnostics;
-using System.IO;
 
-namespace Core.Services
+namespace Core.Services.Estimations
 {
     public class EstimationService : IEstimationService
     {
         private readonly ILogger<EstimationService> _logger;
         private readonly IDocumentStore _store;
         private readonly IConfiguration _configuration;
+        private readonly IQueueService _queueService;
+        private readonly IFbxService _fbxService;
 
         public static Dictionary<string, Process> RunningProcesses = new Dictionary<string, Process>();
 
-        public EstimationService(ILogger<EstimationService> logger, IConfiguration configuration)
+        public EstimationService(ILogger<EstimationService> logger, IConfiguration configuration, IQueueService queueService, IFbxService fbxService)
         {
             _logger = logger;
             _store = DocumentStoreHolder.Store;
             _configuration = configuration;
+            _queueService = queueService;
+            _fbxService = fbxService;
         }
 
-        public IEnumerable<Estimation> GetAllUserEstimations(string userGuid) 
+        public IEnumerable<Estimation> GetAllUserEstimations(string userGuid)
         {
             List<Estimation> estimations = new List<Estimation>();
-            using (var session = _store.OpenSession()) {
+            using (var session = _store.OpenSession())
+            {
                 estimations = session.Query<Estimation>().Where(x => x.UploadingProfile == userGuid).OrderByDescending(x => x.ModifiedDate).ToList();
             }
             return estimations;
         }
-        
-        public Estimation? RegisterEstimation(string displayName, IEnumerable<string> tags, string userGuid) {
+
+        public Estimation? RegisterEstimation(string displayName, IEnumerable<string> tags, string userGuid)
+        {
             string guid = Guid.NewGuid().ToString();
             Estimation? estimation = null;
 
@@ -69,7 +76,7 @@ namespace Core.Services
                 return estimation;
             }
         }
-    
+
         public void HandleUploadedFile(string userGuid, string directory, string fileName, string fileExtension, string displayName, IEnumerable<string> tags)
         {
             // ensure file extension is without dot
@@ -90,7 +97,7 @@ namespace Core.Services
                     estimation.State = EstimationState.Queued;
                     estimation.StateText = "Currently queued, processing continues when gpu is available";
                     UpdateEstimation(estimation);
-                    _ = QueueService.AddToQueueAsync(estimation, this, _store, userGuid, directory, fileName, fileExtension);
+                    _ = _queueService.AddToQueueAsync(estimation, this, _store, userGuid, directory, fileName, fileExtension);
                     return;
                 }
             }
@@ -107,10 +114,12 @@ namespace Core.Services
             string previewPath = $"{fileLocation}_result.mp4";
             string jointPath = $"{fileLocation}_result.json";
             string bvhPath = $"{fileLocation}_motioncapture.bvh";
+            string fbxPath = $"{bvhPath}.fbx";
 
             try
             {
                 RunEstimation(userGuid, directory, fileName, fileExtension, estimation.InternalGuid);
+                _fbxService.CreateFbxFileFromBvh(bvhPath);
                 File.Delete($"{inputPath}");
             }
             catch (Exception ex)
@@ -120,12 +129,13 @@ namespace Core.Services
                 return;
             }
 
-            StoreEstimationResultToDb(estimation, estimationPath, jointPath, previewPath, fileName, bvhPath);
+            StoreEstimationResultToDb(estimation, estimationPath, jointPath, previewPath, fileName, bvhPath, fbxPath);
             File.Delete($"{jointPath}");
             File.Delete($"{previewPath}");
             File.Delete($"{estimationPath}");
             File.Delete($"{npyPath}");
             File.Delete($"{bvhPath}");
+            File.Delete($"{fbxPath}");
 
             return;
         }
@@ -135,13 +145,12 @@ namespace Core.Services
             using (var session = _store.OpenSession())
             {
                 var estimation = session.Query<Estimation>().Where(x => x.InternalGuid == estimationid && x.UploadingProfile == userGuid).FirstOrDefault();
-                if(estimation == null)
+                if (estimation == null)
                 {
                     throw new Exception("Estimation could not be found");
                 }
 
-                var attachmentName = attachmentType == AttachmentType.Joints ? Constants.JOINTS_FILENAME : attachmentType == AttachmentType.Preview ? Constants.PREVIEW_FILENAME : attachmentType == AttachmentType.Bvh ? Constants.MOTIONCAPTURE_FILENAME : Constants.NPZ_FILENAME;
-                var result = session.Advanced.Attachments.Get(estimation, attachmentName);
+                var result = session.Advanced.Attachments.Get(estimation, Constants.GetFilename(attachmentType));
                 return result.Stream;
             }
         }
@@ -158,9 +167,10 @@ namespace Core.Services
 
                 var processes = RunningProcesses.Where(x => x.Key.Equals(estimationid)).ToList();
 
-                if(processes.Any())
+                if (processes.Any())
                 {
-                    foreach(var process in processes) {
+                    foreach (var process in processes)
+                    {
                         if (process.Value != null) process.Value.Kill(true);
                     }
                 }
@@ -174,13 +184,13 @@ namespace Core.Services
         {
             int totalFrames = 0;
             string? estimationScriptLocation = _configuration["EstimationScriptLocation"];
-            string? overridePython = _configuration["OverridePythonVersion"];
+            string? estimatePython = _configuration["EstimatePython"];
             Exception? exception = null;
             Process estimationProcess = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = string.IsNullOrEmpty(overridePython) ? "python" : overridePython,
+                    FileName = string.IsNullOrEmpty(estimatePython) ? "python" : estimatePython,
                     Arguments = $"-u {estimationScriptLocation} --dir {directory}  --user-id {userGuid} --guid {fileName} --file-ext {fileExtension}",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
@@ -220,11 +230,14 @@ namespace Core.Services
                 estimationProcess.BeginErrorReadLine();
                 RunningProcesses.Add(estimationGuid, estimationProcess);
                 estimationProcess.WaitForExit();
-                RunningProcesses.Remove(estimationGuid);
             }
             catch (Exception ex)
             {
                 SetEstimationToFailed(estimationGuid, $"Error during execution of python process of estimation {estimationGuid}: " + ex.Message);
+            }
+            finally
+            {
+                RunningProcesses.Remove(estimationGuid);
             }
 
             if (exception != null)
@@ -236,9 +249,9 @@ namespace Core.Services
         }
 
         //create a new estimation entry and attach a file to it
-        private void StoreEstimationResultToDb(Estimation estimation, string estimationPath, string jointPath, string previewPath, string file_name, string bvhPath)
+        private void StoreEstimationResultToDb(Estimation estimation, string estimationPath, string jointPath, string previewPath, string file_name, string bvhPath, string fbxPath)
         {
-            if(estimation == null)
+            if (estimation == null)
             {
                 throw new Exception("Estimation is missing");
             }
@@ -248,6 +261,7 @@ namespace Core.Services
             using (var estimationFile = File.Open(estimationPath, FileMode.Open))
             using (var jointFile = File.Open(jointPath, FileMode.Open))
             using (var bvhFile = File.Open(bvhPath, FileMode.Open))
+            using (var fbxFile = File.Open(fbxPath, FileMode.Open))
             using (var previewFile = File.Open(previewPath, FileMode.Open))
             {
                 estimation.State = EstimationState.Success;
@@ -257,6 +271,7 @@ namespace Core.Services
                 session.Advanced.Attachments.Store(guid, Constants.PREVIEW_FILENAME, previewFile);
                 session.Advanced.Attachments.Store(guid, Constants.JOINTS_FILENAME, jointFile);
                 session.Advanced.Attachments.Store(guid, Constants.MOTIONCAPTURE_FILENAME, bvhFile);
+                session.Advanced.Attachments.Store(guid, Constants.ANIMATION_FILENAME, fbxFile);
                 session.SaveChanges();
             }
         }
