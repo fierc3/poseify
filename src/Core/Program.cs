@@ -32,7 +32,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = "https://localhost:8001";
+        options.Authority = "https://identity.poseify.ngrok.app/";
         //options.Audience = "https://localhost:44462";
         options.TokenValidationParameters.ValidateAudience = false;
     });
@@ -65,5 +65,15 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers().RequireAuthorization("ApiScope");
+
+app.Use(async (context, next) =>
+{
+    if (context.Request.Headers.TryGetValue("Authorization", out var authHeader))
+    {
+        // This helps for devs to track if the authHeader has been forwarded
+        Console.WriteLine($"Authorization Header: {authHeader}");
+    }
+    await next();
+});
 
 app.Run();
