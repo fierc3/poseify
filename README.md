@@ -6,7 +6,8 @@ Poseify is an open-source web application that allows users to easily and fastly
 ## Techstack
 - .NET C# (Backend)
 - Typescript (Frontend)
-- Python (Pose-Estimations / Animation Generation) 
+- Python (Pose-Estimations / Animation Generation)
+- Blender (FBX generation) 
 
 ## Pose-Estimation Algorithms
 At the latest release, Poseify supports the following pose-estimation algorithms
