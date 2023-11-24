@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BffWeb", "BffWeb\BffWeb.csproj", "{986452DF-5264-424D-837B-15035C4107A0}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BffMobile", "BffMobile\BffMobile.csproj", "{F459EC58-C53A-46EE-ACEE-B0E8EAD0CFBF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{986452DF-5264-424D-837B-15035C4107A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{986452DF-5264-424D-837B-15035C4107A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{986452DF-5264-424D-837B-15035C4107A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F459EC58-C53A-46EE-ACEE-B0E8EAD0CFBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F459EC58-C53A-46EE-ACEE-B0E8EAD0CFBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F459EC58-C53A-46EE-ACEE-B0E8EAD0CFBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F459EC58-C53A-46EE-ACEE-B0E8EAD0CFBF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
