@@ -2,6 +2,6 @@
 {
     public interface IFbxService
     {
-        public void CreateFbxFileFromBvh(string bvhLocation);
+        public void CreateFbxFileFromBvh(string bvhLocation, string fbxScript);
     }
 }
