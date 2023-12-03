@@ -46,7 +46,7 @@ def fillBones(originBone, targetBone, boneName):
 
 def rotateOrigin():
     bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.context.object.rotation_euler[0] = 1.5708
+    bpy.context.object.rotation_euler[0] = 1.9
     bpy.ops.object.transform_apply(location=False, rotation=True, scale=False)
 
 
