@@ -109,6 +109,22 @@ def estimate_pose_for_video(file_dir, user_id, guid, file_extension, new_file_ex
     print('------------------------------')
     output2bvh.read_bvh_data(f"{file_user_guid}_result.json", f"{file_user_guid}_motioncapture.bvh")
 
+    print('------------------------------')
+    print('Generating bvh data with frame 0 including T Pose')
+    print('------------------------------')
+    input_non_tpose = f"{file_user_guid}_motioncapture.bvh"
+    output_tpose = f"{file_user_guid}_tpose.bvh"
+
+    # Read the content of the original file
+    with open(input_non_tpose, 'r') as file:
+        content = file.read()
+
+    # Replace the specified value
+    content = content.replace("Frame Time: 0.03333333333333333", "Frame Time: 0.03333333333333333\n0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0")
+
+    # Write the modified content to the new file
+    with open(output_tpose, 'w') as file:
+        file.write(content)
 
 def ffmpeg_conversion(input_video_location, file_user_guid, new_file_extension=False, scale_fps=False):
     if not new_file_extension:

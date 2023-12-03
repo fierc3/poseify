@@ -7,5 +7,7 @@ public enum AttachmentType
     Joints,
     Npz,
     Bvh,
-    Fbx
+    TBvh,
+    Fbx,
+    TFbx
 }
