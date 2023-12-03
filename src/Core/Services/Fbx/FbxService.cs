@@ -17,9 +17,9 @@ namespace Core.Services.Fbx
             _configuration = configuration;
         }
 
-        public void CreateFbxFileFromBvh(string bvhLocation)
+        public void CreateFbxFileFromBvh(string bvhLocation, string fbxScript)
         {
-            string? fbxScriptLocation = _configuration["FbxScriptLocation"];
+            string? fbxScriptLocation = fbxScript;
             string? fbxBlender = _configuration["FbxBlender"];
 
             // Goal Process:

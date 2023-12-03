@@ -107,6 +107,26 @@ namespace Core.Services.Estimations
 
         public void RunFile(string userGuid, string directory, string fileName, string fileExtension, Estimation estimation)
         {
+            // Load config
+            var estimatorConfigs = _configuration.GetSection("Estimators").Get<List<EstimatorConfig>>();
+            // We always use VideoPose3D for the moment
+            string targetEstimatorName = "VideoPose3d";
+            EstimatorConfig? estimatorConfig = estimatorConfigs?.Find(estimator => estimator.Id == targetEstimatorName);
+
+            if (estimatorConfig == null 
+                || estimatorConfig.EstimationScriptLocation == null 
+                || estimatorConfig.EstimatePython == null
+                || estimatorConfig.FbxScriptLocation == null)
+            {
+                throw new Exception("No valid config found for the requested Estimator");
+            }
+
+            // Config based files and scripts
+            string estimationScriptLocation = estimatorConfig.EstimationScriptLocation;
+            string estimatePython = estimatorConfig.EstimatePython;
+            string fbxScript = estimatorConfig.FbxScriptLocation;
+
+            // Relative files and scripts
             string fileLocation = $"{directory}\\{userGuid}\\{fileName}";
             string estimationPath = $"{fileLocation}.{fileExtension}.npz";
             string npyPath = $"{fileLocation}_result.npy";
