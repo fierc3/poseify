@@ -15,6 +15,8 @@ public class Constants
         : attachmentType == AttachmentType.Preview ? Constants.PREVIEW_FILENAME
         : attachmentType == AttachmentType.Bvh ? Constants.MOTIONCAPTURE_FILENAME
         : attachmentType == AttachmentType.Fbx ? Constants.ANIMATION_FILENAME
+        : attachmentType == AttachmentType.TFbx ? "T_" + Constants.ANIMATION_FILENAME
+        : attachmentType == AttachmentType.TBvh ? "T_" + Constants.MOTIONCAPTURE_FILENAME
         : Constants.NPZ_FILENAME;
 
         return attachmentName;
