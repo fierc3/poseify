@@ -24,3 +24,6 @@ https://youtu.be/sN8toxFbWoY
 
 ## PREVIEW OF MOTION CAPTURE
 https://www.youtube.com/watch?v=q8PgEHOVgWc
+
+## Thesis
+WIPRO: [WIPRO_3d_Pose_Estimation_Server_Pullen_Kirchhofer.pdf](https://github.com/fierc3/poseify/files/13784812/WIPRO_3d_Pose_Estimation_Server_Pullen_Kirchhofer.pdf)
