@@ -25,6 +25,18 @@ https://youtu.be/sN8toxFbWoY
 ## PREVIEW OF MOTION CAPTURE
 https://www.youtube.com/watch?v=q8PgEHOVgWc
 
+## Demo of 1.1.0
+https://youtu.be/u3f29IDg8sY
+
+## Thesis Pitch
+https://youtu.be/HNK8U0aDSYA
+
+## Blender Tutorial
+https://youtu.be/JAYB9XkWBoY
+
+## Unity Tutorial
+https://youtu.be/qDL95QBMFcg
+
 ## Thesis
 WIPRO: [WIPRO_3d_Pose_Estimation_Server_Pullen_Kirchhofer.pdf](https://github.com/fierc3/poseify/files/13784812/WIPRO_3d_Pose_Estimation_Server_Pullen_Kirchhofer.pdf)
 
