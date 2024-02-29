@@ -1,4 +1,3 @@
-from ffmpeg import FFmpeg,Progress
 import subprocess
 import argparse
 import sys
@@ -13,7 +12,7 @@ def parse_args():
         '--dir',
         dest='file_dir',
         help='upload file directory',
-        default='C:\\PoseifyUploads\\',
+        default='C:/PoseifyUploads/',
         type=str
     )
     parser.add_argument(
@@ -60,24 +59,27 @@ def main(args):
     estimate_pose_for_video(args.file_dir, args.user_id, args.guid, args.file_extension, args.new_file_extension, args.scale_fps)
 
 def estimate_pose_for_video(file_dir, user_id, guid, file_extension, new_file_extension=False, scale_fps=False):
-    file_dir.replace('/', '\\')
-    if not file_dir.endswith('\\'):
-        file_dir += '\\'
+    file_dir.replace('/', '/')
+    if not file_dir.endswith('/'):
+        file_dir += '/'
     directory = f"{file_dir}{user_id or ''}"
-    file_user_guid = f"{file_dir}{user_id or ''}\\{guid}"
+    file_user_guid = f"{file_dir}{user_id or ''}/{guid}"
     input_video_location = f"{file_user_guid}.{file_extension}"
     estimation_result_location = f"{file_user_guid}_result"
 
-    if new_file_extension or scale_fps:
-        print('###### Using FFmpeg conversion')
-        input_video_location = ffmpeg_conversion(input_video_location, file_user_guid, new_file_extension, scale_fps)
-        file_extension = new_file_extension or file_extension
     
-    wdir = os.path.dirname(os.path.realpath(__file__)) + '\\vp3d'
+    wdir = '/usr/src/app/vp3d'
     print(f'Wokring directory for vp3d: {wdir}')
 
     print(f'Total Frames: {get_frame_count(input_video_location)}')
-    command = f'python {wdir}\\inference\\infer_video_d2.py --cfg COCO-Keypoints/keypoint_rcnn_R_101_FPN_3x.yaml --output-dir {directory} --image-ext {file_extension} {input_video_location}'
+    #command = f'python {wdir}/inference/infer_video_d2.py --cfg COCO-Keypoints/keypoint_rcnn_R_101_FPN_3x.yaml --output-dir {wdir}/{directory} --image-ext {file_extension} {wdir}/{input_video_location}'
+    command = [
+    "python", "/usr/src/app/vp3d/inference/infer_video_d2.py",
+    "--cfg", "COCO-Keypoints/keypoint_rcnn_R_101_FPN_3x.yaml",
+    "--output-dir", directory,
+    "--image-ext", "mp4",
+    f"{input_video_location}"
+]
     print('-----------------------------')
     print('infer_video_2d.py, 2D joint position inference by Detectron2')
     print(command)
@@ -86,21 +88,24 @@ def estimate_pose_for_video(file_dir, user_id, guid, file_extension, new_file_ex
     if p0.returncode != 0:
         raise Exception( f'Invalid result in infer_video_2d.py: { p0.returncode }' )
 
-    command = f'python prepare_data_2d_custom.py -i {directory} -o {guid}'
+    #command = f'python prepare_data_2d_custom.py -i /usr/src/app/uploads/id -o {guid}'
+    command = f"bash -c 'cd vp3d && cd data && python prepare_data_2d_custom.py -i {directory} -o {guid}'"
     print('-----------------------------')
     print('prepare_data_2d_custom.py, Preparing data for VideoPose3D')
     print(command)
+    print(f'{wdir}/data')
     print('-----------------------------')
-    p1 = subprocess.run(command, cwd=f'{wdir}\\data')
+    p1 = subprocess.run(command, shell=True, check=True, text=True, capture_output=True)
     if p1.returncode != 0:
         raise Exception( f'Invalid result in prepare_data_2d_custom.py: { p1.returncode }' )
 
-    command = f'python {wdir}\\run.py -d custom -k {guid} -arc 3,3,3,3,3 -c checkpoint --evaluate pretrained_h36m_detectron_coco.bin --render --viz-subject {guid}.{file_extension} --viz-action custom --viz-camera 0 --viz-video {input_video_location} --viz-export {estimation_result_location} --viz-output {estimation_result_location}.mp4 --viz-size 6'
+    command = f"bash -c 'cd vp3d && python {wdir}/run.py -d custom -k {guid} -arc 3,3,3,3,3 -c checkpoint --evaluate pretrained_h36m_detectron_coco.bin --render --viz-subject {guid}.{file_extension} --viz-action custom --viz-camera 0 --viz-video {input_video_location} --viz-export {estimation_result_location} --viz-output {estimation_result_location}.mp4 --viz-size 6'"
+    #command = f'python {wdir}/run.py -d custom -k {guid} -arc 3,3,3,3,3 -c checkpoint --evaluate pretrained_h36m_detectron_coco.bin --render --viz-subject {guid}.{file_extension} --viz-action custom --viz-camera 0 --viz-video {input_video_location} --viz-export {estimation_result_location} --viz-output {estimation_result_location}.mp4 --viz-size 6'
     print('------------------------------')
     print('run.py, Generating 3D Joint Positions with VideoPose3D')
     print(command)
     print('------------------------------')
-    p2 = subprocess.run(command, cwd=f'{wdir}')
+    p2 = subprocess.run(command, shell=True, check=True, text=True, capture_output=True)
     if p2.returncode != 0:
         raise Exception( f'Invalid result in run.py: { p2.returncode }' )
     
@@ -125,21 +130,6 @@ def estimate_pose_for_video(file_dir, user_id, guid, file_extension, new_file_ex
     # Write the modified content to the new file
     with open(output_tpose, 'w') as file:
         file.write(content)
-
-def ffmpeg_conversion(input_video_location, file_user_guid, new_file_extension=False, scale_fps=False):
-    if not new_file_extension:
-        output_video_location = input_video_location
-        input_video_location += "_old"
-        os.system(f'copy {output_video_location} {input_video_location}')
-    else:
-        output_video_location = f"{file_user_guid}.{new_file_extension}"
-    
-    if scale_fps:
-        command = ['ffmpeg', '-hwaccel cuvid', '-hide_banner', '-loglevel', 'error','-y', '-i', f'{input_video_location}', '-filter', "minterpolate='fps=50'", '-crf', '0', f'{output_video_location}']
-    else:
-        command = ['ffmpeg', '-hwaccel cuvid', '-hide_banner', '-loglevel', 'error','-y', '-i', f'{input_video_location}', '-crf', '0', f'{output_video_location}']
-    subprocess.run(command)
-    return output_video_location
 
 def get_frame_count(input_video_location):
     command = ['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-count_packets',
