@@ -6,6 +6,6 @@ namespace Core.Services.Queues
 {
     public interface IQueueService
     {
-        public Task AddToQueueAsync(Estimation estimation, EstimationService service, IDocumentStore _store, string userGuid, string directory, string fileName, string fileExtension);
+        public void SendVideo2Pose(Guid estimationId, string type);
     }
 }

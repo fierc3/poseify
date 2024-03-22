@@ -1,8 +1,6 @@
 using Core.Services.Estimations;
-using Core.Services.Fbx;
 using Core.Services.Queues;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +23,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IEstimationService, EstimationService>();
 builder.Services.AddScoped<IQueueService, QueueService>();
-builder.Services.AddScoped<IFbxService, FbxService>();
+builder.Services.AddHostedService<QueueListenerService>();
+builder.Services.AddScoped<IEstimationCleanService, EstimationCleanService>();
 
 builder.Services.AddProblemDetails();
 

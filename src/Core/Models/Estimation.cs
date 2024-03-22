@@ -6,7 +6,7 @@ namespace Core.Models
     [Serializable]
     public class Estimation
     {
-        public string InternalGuid { get; set; } = "";
+        public Guid InternalGuid { get; set; } = Guid.Empty;
         public string DisplayName { get; set; } = "";
         public IEnumerable<string>? Tags { get; set; } = new List<string>();
         public string UploadingProfile { get; set; } = "";

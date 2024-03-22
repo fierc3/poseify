@@ -1,5 +1,7 @@
 using Core.Models;
+using Core.Services.Estimations;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 
 namespace Backend.Controllers
@@ -20,9 +22,6 @@ namespace Backend.Controllers
             _estimationService = estimationHandler;
             _configuration = configuration;
         }
-
-        public delegate void Notify();
-        public event Notify UploadCompleted; // event
 
         [ActionName("PostUpload")]
         [HttpPost(Name = "PostUpload")]
@@ -45,7 +44,8 @@ namespace Backend.Controllers
 
             string? directory = _configuration["UploadDirectory"];
             string userGuid = username;
-            string uniqueFilename = Guid.NewGuid().ToString();
+            var estimationId = Guid.NewGuid();
+
             string fileExtension = System.IO.Path.GetExtension(file.FileName);
 
             if (directory == null)
@@ -67,10 +67,10 @@ namespace Backend.Controllers
 
             if (file.Length > 0)
             {
+                _logger.LogDebug($"Upload started, all checks passed: {estimationId}");
 
-                System.IO.Directory.CreateDirectory($"{directory}\\{userGuid}");
-
-                string fileLocation = $"{directory}\\{userGuid}\\{uniqueFilename}{fileExtension}";
+                // The old pattern was: $"{directory}\\{userGuid}\\{uniqueFilename}{fileExtension}"
+                string fileLocation = $"${_configuration["UploadDirectory"]}/{estimationId}{fileExtension}";
 
                 using (var stream = System.IO.File.Create(fileLocation))
                 {
@@ -79,7 +79,7 @@ namespace Backend.Controllers
 
                 try
                 {
-                    _ = Task.Run(() => _estimationService.HandleUploadedFile(userGuid, directory, uniqueFilename, fileExtension, uploadModel.EstimationName, uploadModel.Tags));
+                    _ = Task.Run(() => _estimationService.HandleUploadedFile(userGuid, directory, estimationId, uploadModel.EstimationName, uploadModel.Tags));
                 }
                 catch (Exception ex)
                 {
@@ -89,7 +89,7 @@ namespace Backend.Controllers
 
             }
 
-            return Ok(new { name = uniqueFilename });
+            return Ok(new { name = estimationId });
         }
     }
 }
