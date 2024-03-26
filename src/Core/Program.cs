@@ -17,7 +17,6 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -31,8 +30,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = "https://identity.poseify.ngrok.app/";
-        //options.Audience = "https://localhost:44462";
+        options.Authority = "https://identity.poseify.ngrok.app/"; // can also be localhost:44462
         options.TokenValidationParameters.ValidateAudience = false;
     });
 
