@@ -1,13 +1,16 @@
 using System.Text.Json.Serialization;
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
-public enum AttachmentType
+namespace Core.Models
 {
-    Preview,
-    Joints,
-    Npz,
-    Bvh,
-    TBvh,
-    Fbx,
-    TFbx
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum AttachmentType
+    {
+        Preview,
+        Joints,
+        Npz,
+        Bvh,
+        TBvh,
+        Fbx,
+        TFbx
+    }
 }

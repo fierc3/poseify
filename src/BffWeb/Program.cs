@@ -1,13 +1,9 @@
 using Duende.Bff.Yarp;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.$
 
 builder.WebHost.ConfigureKestrel(options =>
 {

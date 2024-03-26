@@ -11,15 +11,11 @@ namespace Backend.Controllers
     public class EstimationController : ControllerBase
     {
 
-        private readonly ILogger<EstimationController> _logger;
         private readonly IEstimationService _estimationHandler;
-        private readonly IConfiguration _configuration;
 
-        public EstimationController(ILogger<EstimationController> logger, IEstimationService estimationHandler, IConfiguration configuration)
+        public EstimationController(IEstimationService estimationHandler)
         {
-            _logger = logger;
             _estimationHandler = estimationHandler;
-            _configuration = configuration;
         }
         
 

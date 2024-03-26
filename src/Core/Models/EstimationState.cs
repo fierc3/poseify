@@ -1,10 +1,13 @@
 using System.Text.Json.Serialization;
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
-public enum EstimationState
+namespace Core.Models
 {
-    Processing,
-    Failed,
-    Success,
-    Queued
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum EstimationState
+    {
+        Processing,
+        Failed,
+        Success,
+        Queued
+    }
 }

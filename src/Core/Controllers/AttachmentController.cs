@@ -1,3 +1,4 @@
+using Core.Models;
 using Core.Services.Estimations;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -10,20 +11,16 @@ namespace Backend.Controllers
     public class AttachmentController : ControllerBase
     {
 
-        private readonly ILogger<AttachmentController> _logger;
         private readonly IEstimationService _estimationService;
-        private readonly IConfiguration _configuration;
 
-        public AttachmentController(ILogger<AttachmentController> logger, IEstimationService estimationHandler, IConfiguration configuration)
+        public AttachmentController(IEstimationService estimationHandler)
         {
-            _logger = logger;
             _estimationService = estimationHandler;
-            _configuration = configuration;
         }
 
         [ActionName("GetAttachment")]
         [HttpGet(Name = "GetAttachment")]
-        public async Task<IActionResult> Get(string estimationId, AttachmentType attachmentType)
+        public IActionResult Get(string estimationId, AttachmentType attachmentType)
         {
 
             var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

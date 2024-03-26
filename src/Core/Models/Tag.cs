@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
-
-namespace Core.Models
+﻿namespace Core.Models
 {
     [Serializable]
     public class Tag

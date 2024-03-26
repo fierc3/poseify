@@ -1,24 +1,31 @@
 using Raven.Client.Documents;
 
-public class DocumentStoreHolder
+namespace Core.Db
 {
-    private readonly static Lazy<IDocumentStore> _store =
-        new Lazy<IDocumentStore>(CreateDocumentStore);
-
-    private static IDocumentStore CreateDocumentStore()
+    public class DocumentStoreHolder
     {
-        var store = new DocumentStore
+        private readonly static Lazy<IDocumentStore> _store =
+            new Lazy<IDocumentStore>(CreateDocumentStore);
+
+        protected DocumentStoreHolder()
         {
-            Urls = new[] { "http://localhost:6969" },
-            Database = "Dev"
-        };
+        }
 
-        store.Initialize();
-        return store;
-    }
+        private static IDocumentStore CreateDocumentStore()
+        {
+            var store = new DocumentStore
+            {
+                Urls = new[] { "http://localhost:6969" },
+                Database = "Dev"
+            };
 
-    public static IDocumentStore Store
-    {
-        get { return _store.Value; }
+            store.Initialize();
+            return store;
+        }
+
+        public static IDocumentStore Store
+        {
+            get { return _store.Value; }
+        }
     }
 }

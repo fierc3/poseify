@@ -1,6 +1,4 @@
-﻿using Core.Models;
-
-namespace Core.Services.Estimations
+﻿namespace Core.Services.Estimations
 {
     public interface IEstimationCleanService
     {

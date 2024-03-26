@@ -1,24 +1,30 @@
-public class Constants
+namespace Core.Models
 {
-    public static string NPZ_FILENAME = "estimation.npz";
-    public static string JOINTS_FILENAME = "joints.json";
-    public static string PREVIEW_FILENAME = "preview.mp4";
-    public static string MOTIONCAPTURE_FILENAME = "motioncapture.bvh";
-    public static string ANIMATION_FILENAME = "animation.fbx";
-    public static int MAXPROCESSING = 3;
-
-
-    public static string GetFilename(AttachmentType attachmentType)
+    public class Constants
     {
-        var attachmentName =
-        attachmentType == AttachmentType.Joints ? Constants.JOINTS_FILENAME
-        : attachmentType == AttachmentType.Preview ? Constants.PREVIEW_FILENAME
-        : attachmentType == AttachmentType.Bvh ? Constants.MOTIONCAPTURE_FILENAME
-        : attachmentType == AttachmentType.Fbx ? Constants.ANIMATION_FILENAME
-        : attachmentType == AttachmentType.TFbx ? "T_" + Constants.ANIMATION_FILENAME
-        : attachmentType == AttachmentType.TBvh ? "T_" + Constants.MOTIONCAPTURE_FILENAME
-        : Constants.NPZ_FILENAME;
+        public const string NPZ_FILENAME = "estimation.npz";
+        public const string JOINTS_FILENAME = "joints.json";
+        public const string PREVIEW_FILENAME = "preview.mp4";
+        public const string MOTIONCAPTURE_FILENAME = "motioncapture.bvh";
+        public const string ANIMATION_FILENAME = "animation.fbx";
+        public const int MAXPROCESSING = 3;
 
-        return attachmentName;
+        protected Constants()
+        {
+        }
+
+        public static string GetFilename(AttachmentType attachmentType)
+        {
+            var attachmentName =
+            attachmentType == AttachmentType.Joints ? JOINTS_FILENAME
+            : attachmentType == AttachmentType.Preview ? PREVIEW_FILENAME
+            : attachmentType == AttachmentType.Bvh ? MOTIONCAPTURE_FILENAME
+            : attachmentType == AttachmentType.Fbx ? ANIMATION_FILENAME
+            : attachmentType == AttachmentType.TFbx ? "T_" + ANIMATION_FILENAME
+            : attachmentType == AttachmentType.TBvh ? "T_" + MOTIONCAPTURE_FILENAME
+            : NPZ_FILENAME;
+
+            return attachmentName;
+        }
     }
 }

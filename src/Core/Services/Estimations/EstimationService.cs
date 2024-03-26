@@ -1,9 +1,8 @@
-﻿using Core.Models;
+﻿using Core.Db;
+using Core.Models;
 using Core.Services.Queues;
 using Raven.Client.Documents;
-using Raven.Client.Documents.Attachments;
 using System.Data;
-using System.Diagnostics;
 
 namespace Core.Services.Estimations
 {

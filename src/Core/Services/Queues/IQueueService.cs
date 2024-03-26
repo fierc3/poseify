@@ -1,8 +1,4 @@
-﻿using Core.Models;
-using Core.Services.Estimations;
-using Raven.Client.Documents;
-
-namespace Core.Services.Queues
+﻿namespace Core.Services.Queues
 {
     public interface IQueueService
     {
