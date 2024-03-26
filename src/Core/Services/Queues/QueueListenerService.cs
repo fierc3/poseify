@@ -63,6 +63,7 @@ namespace Core.Services.Queues
                     return;
                 }
 
+                // to do evaluate path
                 _estimationService.StoreEstimationResultToDb(estimation,"estimation", "joint", "previewPath", "filen");
                 _estimationCleanService.CleanAllData(estimationId);
             };
