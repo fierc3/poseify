@@ -15,16 +15,23 @@ namespace Core.Models
 
         public static string GetFilename(AttachmentType attachmentType)
         {
-            var attachmentName =
-            attachmentType == AttachmentType.Joints ? JOINTS_FILENAME
-            : attachmentType == AttachmentType.Preview ? PREVIEW_FILENAME
-            : attachmentType == AttachmentType.Bvh ? MOTIONCAPTURE_FILENAME
-            : attachmentType == AttachmentType.Fbx ? ANIMATION_FILENAME
-            : attachmentType == AttachmentType.TFbx ? "T_" + ANIMATION_FILENAME
-            : attachmentType == AttachmentType.TBvh ? "T_" + MOTIONCAPTURE_FILENAME
-            : NPZ_FILENAME;
-
-            return attachmentName;
+            switch (attachmentType)
+            {
+                case AttachmentType.Joints:
+                    return JOINTS_FILENAME;
+                case AttachmentType.Preview:
+                    return PREVIEW_FILENAME;
+                case AttachmentType.Bvh:
+                    return MOTIONCAPTURE_FILENAME;
+                case AttachmentType.Fbx:
+                    return ANIMATION_FILENAME;
+                case AttachmentType.TFbx:
+                    return "T_" + ANIMATION_FILENAME;
+                case AttachmentType.TBvh:
+                    return "T_" + MOTIONCAPTURE_FILENAME;
+                default:
+                    return NPZ_FILENAME;
+            }
         }
     }
 }
